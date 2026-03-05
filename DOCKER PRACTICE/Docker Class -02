@@ -3,8 +3,22 @@ Docker Class -02
 TOPIC: Docker Architecture Images and containers
 ==================================================
 
-Total class is all about to create images, containers
+Docker Architecture
+======================
 
+Docker Components consists of 3 componets
+1. Docker Client
+2. Docker Host
+3. Docker Registry
+
+yum install docker -y && systemctl start docker------------------------> command to install docker and restart the docker as well
+
+Total class is all about to create images, containers
+===========================================================
+
+docker run -d --name container-name -p host-port-number:container port image--------------> command to create a container
+
+docker run -d --name sonar -p 2222:9000 sonarqube:lts-community-------------> command to create a container with sonarqube latest image
 To see the list of images : --------------------> docker images
 2.  To pull the image : ------------------------> docker pull image-name
 3.  To create a container : --------------------> docker run -d --name cont-name -p host-port:container-port
@@ -22,7 +36,7 @@ image
 14. To remove all stopped containers : ----------------> docker rm $(docker ps -a)
 15. To remove an image : ------------------------------> docker rmi image-name
 16. To remove unused images : -------------------------> docker rmi $(docker images)
-17. To get the full info about container : docker inspect cont-name
-18. To get the container logs : docker logs cont-name
-19. To enter into the container : docker exec -it cont-name bash
-20. To get full info about image : docker inspect image image-name
+17. To get the full info about container : ---------------------> docker inspect cont-name
+18. To get the container logs : --------------------------------> docker logs cont-name
+19. To enter into the container : ------------------------------> docker exec -it cont-name bash
+20. To get full info about image : -----------------------------> docker inspect image image-name
