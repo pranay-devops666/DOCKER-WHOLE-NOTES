@@ -14,69 +14,91 @@ Todays Commands:
 
 
 
-    1  yum install docker -y
+    1  yum install docker -y -------------------------------> command to install docker
 
-    2  docker version
+    2  docker version --------------------------------------> command to check docker version
 
-    3  systemctl status docker
+    3  systemctl status docker -----------------------------> command to check status of docker
 
-    4  systemctl start docker
+    4  systemctl start docker -----------------------------> command to check start the docker
 
-    5  systemctl status docker
+    5  systemctl status docker -----------------------------> command to check status of docker
 
-    6  docker version
+    6  docker version --------------------------------------> command to check the version of docker
 
-    7  docker pull shaikmustafa/paytm:bus
+    7  docker pull shaikmustafa/paytm:bus ------------------> command to pull/download  the image form the dockerhub
 
-    8  docker images
+    8  docker images ---------------------------------------> command to see list of images
 
-    9  docker run -d --name bus -p 1431:80  shaikmustafa/paytm:bus
+    9  docker run -d --name bus -p 1431:80  shaikmustafa/paytm:bus------------> command to create a container through image with port number (bus is the
+                                                                name, shaikmustafa/paytm:bus is the image name, 1431 is the host port/custom portnumber 
+                                                                                                           :80 is the container port depends on application
+                                                                                                     like timcat webserver application port no. is 80 like that)
 
-   10  docker ps
 
-   11  docker logs bus
+http://3.93.75.138:1431/------------------> able to access the application with container port no:1413
 
-   12  docker ps
+3.93.75.138:1431(3.93.75.138---------> it public IP of Docker EC2-Instance & 1431 is the name of the container)
+                                                                                                                                                        
 
-   13  docker pull shaikmustafa/paytm:movie
+   10  docker ps ------------------> command to view list of containers in a docker
 
-   14  docker images
+   11  docker logs bus ------------> command to know the logs of container name of bus
 
-   15  docker run -d --name movie -p 1111:80  shaikmustafa/paytm:movie
+   12  docker ps ------------------> command to know the list of containers 
 
-   16  docker ps
+   13  docker pull shaikmustafa/paytm:movie ------------------> command to pull/download  the image form the dockerhub
 
-   17  docker pull shaikmustafa/paytm:bank
+   14  docker images ----------------> command to see list of images
 
-   18  docker images
+   15  docker run -d --name movie -p 1111:80  shaikmustafa/paytm:movie command to create a container through image with port number (movie is the container name,
+                                                                name, shaikmustafa/paytm:bus is the image name, 1111 is the host port/custom portnumber 
+                                                                                                           :80 is the container port depends on application
+                                                                                                     like timcat webserver application port no. is 80 like that)
 
-   19  docker run -d --name bank -p 2222:80 shaikmustafa/paytm:movie
+   16  docker ps ------------------> command to know the list of containers 
 
-   20  docker ps
+   17  docker pull shaikmustafa/paytm:bank ------------------> command to pull/download  the image form the dockerhub
 
-   21  docker rm bank
+   18  docker images ----------------> command to see list of images
 
-   22  docker stop bank
+   19  docker run -d --name bank -p 2222:80 shaikmustafa/paytm:movie ---------------> command to create a container through image with port number (bank is the
+                                                                name, shaikmustafa/paytm:movie is the image name, 2222 is the host port/custom portnumber 
+                                                                                                           :80 is the container port depends on application
+                                                                                                     like timcat webserver application port no. is 80 like that)
 
-   23  docker rm bank
+   20  docker ps --------------------------------> command to know the list of containers 
 
-   24  docker ps
 
-   25  docker run -d --name bank -p 2222:80 shaikmustafa/paytm:bank
+   21  docker rm bank ---------------------------> command to remove delete container name bank
 
-   26  docker ps
+   22  docker stop bank ---------------------------> command to stop container name bank
 
-   27  docker stop movie
+   23  docker rm bank ---------------------------> command to remove delete container name bank
 
-   28  docker start movie
+   24  docker ps --------------------------------> command to know the list of containers 
 
-   29  docker stop bank
+   25  docker run -d --name bank -p 2222:80 shaikmustafa/paytm:bank---------------> command to create a container through image with port number (bank is the
+                                                                name, shaikmustafa/paytm:movie is the image name, 2222 is the host port/custom portnumber 
+                                                                                                           :80 is the container port depends on application
+                                                                                                     like timcat webserver application port no. is 80 like that)
 
-   30  docker start banl
 
-   31  docker start bank
+   26  docker ps --------------------------------> command to know the list of containers 
 
-   32  docker images
+   27  docker stop movie ------------------------> command to stop the container with name movie
+
+   28  docker start movie -----------------------> command to start the container with name movie
+
+   29  docker stop bank ------------------------> command to stop the container with name bank
+
+   30  docker start bank -----------------------> command to start the container with name movie
+
+   31  docker start bank -----------------------> command to start the container with name movie
+
+   32  docker images ----------------> command to see list of images
+
+
 history
 
 yum install docker -y                    --------> command to install docker
