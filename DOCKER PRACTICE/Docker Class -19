@@ -1,0 +1,173 @@
+Docker Class -19
+
+TOPIC: DOCKER PROJECT - 3 (PYTHON APP)
+===========================================
+
+We are going to build Online Library Application using Python Programming Language
+
+Code: Python
+Dockerfile
+DockerCompose
+
+
+CI/CD pipeline stages are 
+
+Code ----------> CQA --------> Build & Test (which is docker build)----------> Scan(using trivy) ------------> Registory -------> Deploy(using stack) ------> Post Build Actions
+
+
+First Launch an one Ec2-Instance 
+
+Ec2-Instances we need are
+
+1. Jenkins CI Server
+2. Master server
+3. Worker Node-1
+4. Worker Node-2
+
+overall we need 4 Instances
+
+Launch Inatsnce -----------> no. of instance: 2 --------> Instance Type: c7i-flex-large ---------> key pair --------> jenkins security group -------> 28gb ebs volume
+---------> launch instances 
+
+1. for master server
+2. for jenkins server
+
+Launch Inatsnce -----------> no. of instance: 2 --------> Instance Type: t3.micro ---------> key pair --------> jenkins security group -------> 28gb ebs volume
+---------> launch instances
+
+1. worker-1 server
+2. worker-1 server
+
+
+connect jenkins server & launch Jenkins Dashboard as well
+
+Create a Job ----------> name: Deployment
+
+pipeline {
+    agent any
+    stages {
+        stage ("Code") {
+            steps {
+                git "https://github.comdevops0014/python-code-library-app.git"
+            }
+        }
+    }
+}
+
+connect Master server and install java=17 & git into it
+
+yum install java-17-amazon-corretto -y
+
+yum install git -y
+
+then go to Jenkins Dashboard and setup agent
+
+go to jenkins dashboard ---------> select manage jenkins ----------> select nodes --------> new node --------> name: docker node ----------> no. of executors :2
+------> remote root direcory: /home/ec2-user/jenkins/ -------> labels: prod --------> usage: only build jobs with matching this node -------> launch agents via ssh
+------> host: private ip of master server -------> add credentials ------> kind: ssh username with private key -------> id: master ------> description: docker swarm
+-------> username: ec2-username -----------> private key: enter directly: copy and paste keypair data here --------> host key verification: non-verify strategy ---->save
+
+
+
+go to created Job and do configuration like below
+
+
+
+pipeline {
+    agent { 
+        node {
+          label 'prod'
+        }
+    }
+    stages {
+        stage ("Code") {
+            steps {
+                git "https://github.comdevops0014/python-code-library-app.git"
+            }
+        }
+    }
+}
+
+
+save & build now
+
+
+go to manage jenkins ----------> select plugins ---------> search as pipeline stage view and install it
+
+
+
+first stage is done
+
+
+nowwe need to do 2nd stage here
+
+go to Jenkins server and launch the server
+
+install docker here
+
+yum install docker & systemctl start docker -y
+
+
+now install the sonarqube
+
+docker run -itd --name sonar -p 9000:9000 sonarqube:lts-community --------->
+
+try to access sonarqube dashboard with port number 9000
+
+Sonarqube dashboard has been launched been launched 
+
+
+select projects ---------> create new project --------> select manual --------> create --------. intigrating with jenkins ------. github ------> create a  jenkins file
+ here select others --------> 
+
+
+go to jenkins dashboard -----------> select manage jenkins ----------> select plugins --------> search as sonarqube scanner ------> install it
+
+
+
+go to jenkins dashboard -----------> select manage jenkins ----------> select system --------> select sonarqube integration --------> name : my sonar --->
+
+serverl url : give here sonarqube dashboard url upto 9000 -------> credentials ---------> kind: secret text --------> in secret: copy & paste the password 
+which we get from sonarqube dashboard (go to sonarqube dashboard -----> select account ------. new token --------> create token ) --------> ID: sonar-token
+description: sonarqube password ----------> save
+
+go to jenkins dashboard -----------> select manage jenkins ----------> select tools --------> search as sonarqube scanner ------> save
+
+
+upto now sonarqube integration has been completed 
+
+now will do integrate with our jenkins pipeline like below
+
+
+
+go to created Job and do configuration like below
+
+
+
+pipeline {
+    agent { 
+        node {
+          label 'prod'
+        }
+    }
+    environment {
+        scannerHome = tool 'mysonar'
+    }
+    stages {
+        stage ("Code") {
+            steps {
+                git "https://github.comdevops0014/python-code-library-app.git"
+            }
+        }
+        stage ("CAQ") {
+            steps {
+                withSonarQubeENv ('mysonar') {
+                    sh "${scanerHome}/bin/sonar-scanner"
+                }
+            }
+        }
+    }
+}
+
+
+save & build now
