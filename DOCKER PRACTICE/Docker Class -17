@@ -1,0 +1,457 @@
+Docker Class -17
+
+TOPIC: DOCKER PROJECT ON STACK
+===================================
+
+DOCKER PROJECT ON STACK
+
+
+
+launch 3 instances 
+1. for MANAGER 2 & 3 for WORKDRE1, WORKER2
+
+launch instance---> MANAGER-------->m7i-flex-large----> keypair----> sg-----> launch instance
+launch instance---> WORKER1-------->t3.micro----> keypair----> sg-----> launch instance
+launch instance---> WORKER2-------->t3.micro----> keypair----> sg-----> launch instance
+
+hostnamectl set-hostname "MANAGER"
+hostnamectl set-hostname "MWORKER-1"
+hostnamectl set-hostname "WORKRR-2"
+
+
+
+
+connect all instances and install DOCKER on each instances
+
+yum install docker -y && systemctl start docker
+
+take another instance for JEnkins CI/CD
+
+launch instance----> tc7i-frlx-large0--------->jenkinssg----->18----->launch instance
+
+docker swarm init
+
+[root@MANAGER ~]# docker swarm init
+Swarm initialized: current node (mbkdw55j63jjpjscv6it5tv9n) is now a manager.
+
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-5gq0o1lgsudp3ojr937vxo92wv3qzx6q7g9jtau9oppofv4k11-4057uq7eeh6znga344au72y6q 172.31.37.241:2377
+
+To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+
+[root@WORKER-1 ~]# docker swarm join --token SWMTKN-1-5gq0o1lgsudp3ojr937vxo92wv3qzx6q7g9jtau9oppofv4k11-4057uq7eeh6znga344au72y6q 172.31.37.241:2377
+This node joined a swarm as a worker.
+[root@WORKER-1 ~]#
+
+[root@WORKER-2 ~]# docker swarm join --token SWMTKN-1-5gq0o1lgsudp3ojr937vxo92wv3qzx6q7g9jtau9oppofv4k11-4057uq7eeh6znga344au72y6q 172.31.37.241:2377
+This node joined a swarm as a worker.
+[root@WORKER-2 ~]# 
+
+
+[root@MANAGER ~]# docker node ls
+ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+mbkdw55j63jjpjscv6it5tv9n *   MANAGER    Ready     Active         Leader           25.0.13
+82qnrnh2e1adtsn1s26s80c2n     WORKER-1   Ready     Active                          25.0.13
+vqe11yvm8navyjcq8ijax2e4e     WORKER-2   Ready     Active                          25.0.13
+[root@MANAGER ~]# 
+
+
+go to JENKINS launched instance
+
+
+install jenkins on that instance
+
+sudo yum update –y
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo yum upgrade
+sudo yum install java-17-amazon-corretto -y
+sudo yum install jenkins git -y
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
+sudo systemctl status jenkins
+
+
+http://54.204.120.151:8080/
+
+launched jenkins dashboard
+
+now JENKINS instance is seperate & MANAGER instance is seperate
+but jenkins pipeline will be run on MANAGER instance
+
+what to do ro run the jenkins pipeline on Manager instance is 
+to do is master & slave concept here
+
+plugins need to install in jenkinks dashboard while doing doing project is 
+1. Pipeline: Stage ViewVersion
+2. sonarqube plugin
+3. docker pipeline plugin
+
+go to manage jenkins---> select nodes---> create node---> name:docker-node---->create
+
+no.of executes:2----> remote root directory:/home/ec2-user/jenkins/---->label name:docker--->usage: only build jobs with label expressions matching with node------>
+launch method:launch agent via ssh----->host:MANAGER instance private IP address---------> credntials:select jenkins-->kind:ssh username with priavate key------>
+ID:dockernode-------->description:this is for docker server------>username:ec2-user, entire directly------>add credentials----host-key verification---->
+non-verify verification strategy------>save
+
+after creating a node the node will went offline why because the jav didn't installed in MANAGER instance
+
+install java on MANAGER instance
+
+yum install java-17-amazon-corretto
+
+now node became online
+
+now we will do run pipeline on created node
+
+install git on MANAGER instance
+
+yum install git -y
+
+now create containers on MANAGER instance
+
+docker run -itd --name sonar -p 1234:9000 sonarqube:lts-community
+
+now do access by copying MANAGER ip/1234
+
+http://54.175.97.173:1234/
+
+[root@MANAGER ~]# docker ps -a
+CONTAINER ID   IMAGE                     COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+b86e8b2e9aec   sonarqube:lts-community   "/opt/sonarqube/dock…"   51 seconds ago   Up 49 seconds   0.0.0.0:1234->9000/tcp, :::1234->9000/tcp   sonar
+[root@MANAGER ~]# docker ps
+CONTAINER ID   IMAGE                     COMMAND                  CREATED          STATUS          PORTS                                       NAMES
+b86e8b2e9aec   sonarqube:lts-community   "/opt/sonarqube/dock…"   54 seconds ago   Up 52 seconds   0.0.0.0:1234->9000/tcp, :::1234->9000/tcp   sonar
+[root@MANAGER ~]# 
+
+now do access sonar like below
+
+http://54.166.136.252:1234/
+
+go to jenkins dashboard and install sonarqube plugin
+
+go to manage jenkins---------> select systems--------> select sonarqube installations---> add sonarqube installations------>name:mysonar----->paste the sonarqube 
+dashboard url------>add sonarqube credentials here--------->kind:secret text--------->take token from sonarqube dashboard
+
+
+
+go to manage jenkins---------> select tools ----------> add SonarQube Scanner installations ----->name:mysonar------> save
+
+
+go to manage jenkins---------> select tools ----------> add maven ----->name:mymaven------> save
+
+
+create job ------> name:MyDeploymet
+
+
+
+pipeline {
+    agent {
+        node {
+            label 'docker'
+        }
+    }
+    tools {
+        maven 'mymaven'
+    }
+    stages {
+        stage('Code') {
+            steps {
+                git "https://github.com/devops0014/dockerwebapp.git"
+            }
+        }
+    stage ("CQA") {
+        steps {
+            withSonarQubeEnv("mysonar") {
+                sh "mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MyProject"
+            }
+        }
+    }
+  }
+}
+
+
+save and build the job-----> build job success
+
+upto now Build got success.
+
+before doing this job configuration do install trivy on MANAGER instance
+
+[root@MANAGER ~]# curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.67.2
+aquasecurity/trivy info checking GitHub for tag 'v0.67.2'
+aquasecurity/trivy info found version: 0.67.2 for v0.67.2/Linux/64bit
+aquasecurity/trivy info installed /usr/local/bin/trivy
+[root@MANAGER ~]# trivy --version
+Version: 0.67.2
+[root@MANAGER ~]# 
+
+go to job and add another stage like below
+
+and install docker pipeline plugin as well in jenkins dashboard
+
+
+pipeline {
+    agent {
+        node {
+            label 'docker'
+        }
+    }
+    tools {
+        maven 'mymaven'
+    }
+    stages {
+        stage('Code') {
+            steps {
+                git "https://github.com/devops0014/dockerwebapp.git"
+            }
+        }
+        stage ("CQA") {
+            steps {
+                withSonarQubeEnv("mysonar") {
+                    sh "mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MyProject"
+                }
+            }
+        }
+        stage ("Build") {
+            steps {
+                sh 'mvn clean package'
+                sh 'cp -r target Docker-app'
+            }
+        }
+        stage ("Image") {
+            steps {
+                sh 'docker build -t appimage Docker-app'
+                sh 'docker build -t dbimage Docker-db'
+            }
+        }
+        stage ("ScanImage") {
+            steps {
+                sh 'trivy image appimage'
+                sh 'trivy image dbimage'
+            }
+        }
+        stage ("Tag") {
+            steps {
+                sh 'docker tag appimage pranay419/mynewapp:appimage'
+                sh 'docker tag dbimage pranay419/mynewapp:dbimage'
+            }
+        }
+        stage ("Push") {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-nodess') {
+                        sh 'docker push pranay419/mynewapp:appimage'
+                        sh 'docker push pranay419/mynewapp:dbimage'
+                    }
+                }
+            }
+        }
+        stage ("Deploy") {
+            steps {
+                sh 'docker stack deploy flm --compose-file=compose.yml'
+            }
+        }
+    }
+}
+
+
+save the job and build now
+
+job build got FAILURE 
+to get rid of this failure gie this command on MANAGER instance before giving the command need to install dockercompose on MANAGER instance
+
+chmod 777 /var/run/docker.sock
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+# Apply executable permissions
+sudo chmod +x /usr/local/bin/docker-compose
+# Create a symbolic link
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+# Install using pip (Python package manager)
+sudo yum install -y python3-pip
+sudo pip3 install docker-compose
+
+#check version
+docker-compose --version
+
+chmod 777 /var/run/docker.sock
+
+
+as of now we are using docker swarm or docker stack we are going to use thats why we used docker cluster like MANAGER, and 2 workers
+
+then what we need to do is we will use docker stack
+
+we need compose and stack to use stack
+
+we already have the cluster
+
+then need to get compose 
+
+go to github-------->all setups repo----->select dockercompose.sh------> open and copy the commands from 6th line all over there and paste in on 
+MANAGER instance
+
+then now need to write dockercompose file here on MANAGER instance
+
+chmod 777 /var/run/docker.sock
+
+now run the same job again
+
+
+need to change compose.yml in github like below ad run the job
+
+---
+version: "3"
+services:
+ devopsdb:
+   image: shaikmustafa/mynewapp:dbimage
+   ports:
+     - "3306:3306"
+
+ application:
+   image: shaikmustafa/mynewapp:appimage
+   ports:
+     - "1234:8080"
+   depends_on:
+     - "devopsdb"
+
+
+Change application port from 1234 to 1111
+
+---
+version: "3"
+services:
+ devopsdb:
+   image: shaikmustafa/mynewapp:dbimage
+   ports:
+     - "3306:3306"
+
+ application:
+   image: shaikmustafa/mynewapp:appimage
+   ports:
+     - "1111:8080"
+   depends_on:
+     - "devopsdb"
+
+
+
+[root@manager ~]# docker stack ls
+NAME      SERVICES
+flm       2
+[root@manager ~]# docker service ls
+ID             NAME              MODE         REPLICAS   IMAGE                            PORTS
+dsgbq5ty5n5i   flm_application   replicated   1/1        shaikmustafa/mynewapp:appimage   *:1111->8080/tcp
+ij7bhxciaa3w   flm_devopsdb      replicated   1/1        shaikmustafa/mynewapp:dbimage    *:3306->3306/tcp
+[root@manager ~]# 
+
+now try to access application 
+
+by copying worker1 or worker2 PublicIP:1111
+
+http://98.84.46.23:1111/login
+
+application will be able to access
+
+[root@manager ~]# docker service scale flm_application=3
+flm_application scaled to 3
+overall progress: 3 out of 3 tasks 
+1/3: running   [==================================================>] 
+2/3: running   [==================================================>] 
+3/3: running   [==================================================>] 
+verify: Service converged 
+[root@manager ~]# docker service scale flm_devopsdb=3
+flm_devopsdb scaled to 3
+overall progress: 3 out of 3 tasks 
+1/3: running   [==================================================>] 
+2/3: running   [==================================================>] 
+3/3: running   [==================================================>] 
+verify: Service converged 
+[root@manager ~]# 
+
+
+[root@manager ~]# docker service ls
+ID             NAME              MODE         REPLICAS   IMAGE                            PORTS
+dsgbq5ty5n5i   flm_application   replicated   3/3        shaikmustafa/mynewapp:appimage   *:1111->8080/tcp
+ij7bhxciaa3w   flm_devopsdb      replicated   3/3        shaikmustafa/mynewapp:dbimage    *:3306->3306/tcp
+[root@manager ~]# docker service ps flm_application
+ID             NAME                IMAGE                            NODE       DESIRED STATE   CURRENT STATE           ERROR     PORTS
+u69gwn4y6xfs   flm_application.1   shaikmustafa/mynewapp:appimage   worker-1   Running         Running 8 minutes ago             
+xt7hqd3buk1l   flm_application.2   shaikmustafa/mynewapp:appimage   manager    Running         Running 2 minutes ago             
+nq02t4co6be0   flm_application.3   shaikmustafa/mynewapp:appimage   worker-2   Running         Running 2 minutes ago             
+[root@manager ~]# docker service ps flm_devopsdb
+ID             NAME             IMAGE                           NODE       DESIRED STATE   CURRENT STATE                ERROR     PORTS
+9cewf46a0q6g   flm_devopsdb.1   shaikmustafa/mynewapp:dbimage   manager    Running         Running 8 minutes ago                  
+t6ylnv7bzug7   flm_devopsdb.2   shaikmustafa/mynewapp:dbimage   worker-1   Running         Running about a minute ago             
+ah2w8v4oisn5   flm_devopsdb.3   shaikmustafa/mynewapp:dbimage   worker-2   Running         Running about a minute ago             
+[root@manager ~]# 
+
+
+DOCKER PROJECT ON STACK JOB-PIPELINE
+==========================================
+
+pipeline {
+    agent {
+        node {
+            label 'docker'
+        }
+    }
+    tools {
+        maven 'mymaven'
+    }
+    stages {
+        stage('Code') {
+            steps {
+                git "https://github.com/devops0014/dockerwebapp.git"
+            }
+        }
+    stage ("CQA") {
+        steps {
+            withSonarQubeEnv("mysonar") {
+                sh "mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MyProject"
+            }
+        }
+    }
+    stage ("Build") {
+        steps {
+            sh 'mvn clean package'
+            sh 'cp -r target Docker-app'
+        }
+    }
+ // add nexus stage here
+    stage ("Image") {
+        steps {
+            sh 'docker build -t appimage Docker-app'
+            sh 'docker build -t dbimage Docker-db'
+        }
+    }
+    stage ("ScanImage") {
+        steps {
+            sh 'trivy image appimage'
+            sh 'trivy image dbimage'
+        }
+    }
+    stage ("Tag") {
+        steps {
+            sh 'docker tag appimage shaikmustafa/mynewapp:appimage'
+            sh 'docker tag dbimage shaikmustafa/mynewapp:dbimage'
+        }
+    }
+    stage ("Push") {
+        steps {
+            script {
+                withDockerRegistry(credentialsId: 'dockerhub') {
+                    sh 'docker push shaikmustafa/mynewapp:appimage'
+                    sh 'docker push shaikmustafa/mynewapp:dbimage'
+                }
+            }
+        }
+    }
+    stage ("Deploy") {
+        steps {
+            sh 'docker stack deploy flm --compose-file=compose.yml'
+        }
+    }
+  }
+}
