@@ -17,6 +17,11 @@ Dockerfile----------> if we build this Dockerfile IMAGE will be created --------
           <------>RUN                                                   <--------->CMD
 
 
+Deepseek code link : 
+=======================
+
+e-commerce app : https://chat.deepseek.com/share/7avbonbpq9vno81bvj
+Python-app : https://chat.deepseek.com/share/qpyne33hte7plm5729
 
 first create one folder name as e-comm-app
 go to that folder cd e-com-app
