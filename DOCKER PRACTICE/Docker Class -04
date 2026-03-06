@@ -4,8 +4,19 @@ TOPIC: DOCKER FILE FOR HTTPD, NGINX AND PYTHON APPLICATION
 ================================================================
 
 DOCKER FILE FOR HTTPD, NGINX AND PYTHON APPLICATION
+
 following below steps to do all those 
 code---->Dockerfile----->build this Dockerfile------->image will be created----->if we run the image container will be created
+
+RUN ------------> this component is used to execute the commands while creating an image
+EX: docker build -t imagename:version .
+CMD ------------> this component is used to execute the commands while creating a container
+EX: docker run -itd --name containername imagename:version
+
+Dockerfile----------> if we build this Dockerfile IMAGE will be created ------------>if we run this iamge the CONTAINER will be created 
+          <------>RUN                                                   <--------->CMD
+
+
 
 first create one folder name as e-comm-app
 go to that folder cd e-com-app
@@ -14,30 +25,38 @@ SOURCE CODE -------> e-commerce app : https://chat.deepseek.com/share/7avbonbpq
 search image name as httpd in dockerhub to know the httpd default path
 create another file to write Docker file 
 file name as vim Dockerfile
+
 in this Dockerfile write Dockerfile components as following below
+
+
+vim Dockerfile
 
 FROM httpd
 LABEL this is e-com app image
 MAINTAINER name pranay
 EXPOSE 80
-COPY index.html /usr/local/apache2/htdocs/
-(/usr/local/apache2/htdocs/-------> httpd default path)
+COPY index.html /usr/local/apache2/htdocs/------> (/usr/local/apache2/htdocs/-------> httpd default path)
 
-docker build -t myapp .
+:wq
 
-docker images
 
-docker run -itd --name e-com -p 1234:80 myapp
-docker ps -a
-docker ps
+docker build -t myapp . ----------> command to build the Dockerfile through image name myapp
+
+docker images -----------------> command to see list of images
+
+docker run -itd --name e-com -p 1234:80 myapp ---------------> command to create the container
+docker ps -a --------------> command to see the running containers
+docker ps -----------------> command to see the ;ist of containers
 copy the public IP of ec2-instance and paste in new tab as public IP:1234 ---------> to access the application with ec2-instance publicIP:containernumber(1234)
 
 
-from starting first line to 26th lines steps all we done for HTTPD 
+from above steps all we done for HTTPD 
+==========================================
 
 Now we will do same procedure for NGINX as well
+=================================================
 
-go to home giving command as cd enter
+go to home root directory giving command as cd enter
 
 make one folder here 
 name it as version-2e-com-app
@@ -51,6 +70,8 @@ create two files here
 vim index.html
 paste here the source code
 
+vim index.html
+
 vim Dockerfile 
 FROM nginx
 LABEL this is version-2-ecom-app image
@@ -59,9 +80,14 @@ EXPOSE 80
 COPY index.html /usr/share/nginx/html
 (/usr/share/nginx/html------------->nginx default path)
 
-docker build -t myapp:v2 .
+:wq
 
-docker run -itd --name v2-cont -p 1111:80 myapp:v2
+
+docker build -t myapp:v2 . ----------> command to build the Dockerfile through image name myapp:version2
+
+docker run -itd --name v2-cont -p 1111:80 myapp:v2 -----------> command to create container with container port 1111 and application port number 80 with 
+                                                                image name myapp:version2
+
 copy the public IP of ec2-instance and paste in new tab as public IP:1111 ---------> to access the application with ec2-instance publicIP:containernumber(1111)
 
 
