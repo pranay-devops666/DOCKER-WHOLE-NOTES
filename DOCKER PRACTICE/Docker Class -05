@@ -330,7 +330,7 @@ FROM mysql/mysql-server:5.7
 ENV MYSQL_USER=root
 ENV MYSQL_ROOT_PASSWORD=babu@123
 EXPOSE 3306
-COPY init.sql /etc/mysql/conf.d/db_backup.sql
+COPY init.sql docker-entrypoint-initdb.d/db_backup.sql
 
 :wq
 
@@ -404,7 +404,7 @@ owners.
 
 Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-mysql> show databases;
+mysql> show databases; -----------------------> command to show created Databases
 +--------------------+
 | Database           |
 +--------------------+
@@ -416,12 +416,9 @@ mysql> show databases;
 4 rows in set (0.00 sec)
 
 mysql> use pranay;
-ERROR 1049 (42000): Unknown database 'pranay'
+Database changed
 mysql> show tables;
-ERROR 1046 (3D000): No database selected
-mysql> use pranay;
-ERROR 1049 (42000): Unknown database 'pranay'
-mysql> 
+Empty set (0.00 sec)
 
 
 docker exec -it dbcont bash--------> command to eneter into db container
