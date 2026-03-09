@@ -5,6 +5,181 @@ TOPIC: AS AUTOMATION SCRIPT 3-TIER APP DEPLOYMENT USING JENKINS AND DOCKERFILE
 
 3-TIER APP DEPLOYMENT USING JENKINS AND DOCKERFILE AS AUTOMATION SCRIPT
 
+CODE(GitHub)-----------> CAQ(SONARQUBE)---------->Build(With Maven)-------------->(we can store it)Artifact(Nexus)-------------> Dockerfile
+(we will Build the Dockerfile)----------> we will create container(By using Docker)
+
+Tools need to be Install
+
+DOCKER, JENKINS, GIT, SONAR, MAVEN, NEXUS
+
+First Launch an EC-Instance----------------> Name:PROJECT-----------> Instance type:mci-flex-large----------> with keypair----------> jenkins security group------->
+---------> 28gb ebs volume---------> launch and connect EC2-Instance
+
+set hostname as 3-Tier-Application like below
+
+[root@3-Tier-Application ~]#
+
+create one file to install all tools at a time
+
+vim tools.sh ------------------------------------------> command to create a file with name tools.sh
+
+sudo yum update –y
+sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo yum upgrade
+sudo yum install java-17-amazon-corretto -y
+sudo yum install jenkins git maven -y
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
+sudo systemctl status jenkins
+sudo systemctl start docker
+
+:wq
+
+[root@3-Tier-Application ~]# vim tools.sh ------------------------------------------> command to create a file with name tools.sh
+
+[root@3-Tier-Application ~]# sh tools.sh ---------------------------> command to execute the file
+
+Now Launch an Jenkins Dashboard by using copying the Public IPwith port number 8080 like below
+
+http://35.175.143.186:8080/--------------> Launching the Jenkins Dashboard
+
+Install pipeline stage view plugin to view logs and console output clearly
+
+Go to manage jenkins--------------> select plugins -----------> search as pipeline stage view----------------> install it
+
+Now create a Job
+
+Click on New Item ---------------> create a pipeline Job-----------> Name:Pipeline
+
+pipeline {
+    agent any
+    stages {
+        stage ("Code") {
+            steps {
+                git 'https://github.com/pranay-devops666/dockerwebapp.git'
+            }
+        }
+    }
+}
+
+save & Build the Job
+
+Build Job got success -----------> code has came
+
+Now we need to do add CAQ stage for sonarQube
+
+Previously we taken an seperate EC2-Instance to install Sonarqube for to add a CAQ Stage in pipeline job
+
+Now we had installed Docker in our Ec2-Instance we can able to get the Sonarqube official Image from DockerHub like below
+
+Go to DockerHub -------------> search Image as sonarqube official Image--------> in here official Image there will be a commands
+
+By using this sonarqube official Image we can to run a sonarqube inside a container
+
+docker run --name sonar -p 9000:9000 sonarqube:lts-community -------------> command to install sonarqube official Image(ommand also taken from DockerHub)
+
+Now see container has been created or not
+
+[root@3-Tier-Application ~]# docker ps -a
+CONTAINER ID   IMAGE                     COMMAND                  CREATED         STATUS              PORTS                                       NAMES
+86264675ceaa   sonarqube:lts-community   "/opt/sonarqube/dock…"   7 minutes ago   Up About a minute   0.0.0.0:9000->9000/tcp, :::9000->9000/tcp   sonar
+[root@3-Tier-Application ~]#
+
+In SonarQube there is a default credentials are there like below
+
+username:admin
+password:admin
+
+Login Successfully in SonarQube Dashboard
+
+In SonarQube Dashboard---------> select Manually--------> Projectname:MyProject-------> setup-----------> with jenkins--------> with GitHub--------> with
+Maven----------> continue--------> commands will come here taking that commands we need to give in job pipline in CAQ stage
+
+before going to add CAQ stage in job pipeline we need to Install Sonarqube plugin in it
+
+Go to manage jenkins--------------> select plugins -----------> search as sonarqube scanner----------------> install it
+
+again Go to manage jenkins and sonarqube configuration like below
+
+Go to manage jenkins---------> select systems ---------> select sonarqube Installations----------> Add sonarqube---------> name:mysonar---------> sonar server: paste
+here sonarqube dashboard URL (http://35.175.143.186:9000/)-------------> add sonarqube credentials -------> add------> kind:secret text-------->here secrect: we
+will get from sonarqube dashboard----------> go to sonarqube dashboard---> my account------> settings------> generate token here ------>name:jenkins token-------->
+
+Go to manage jenkins--------------> select tools ---------> add sonar tool & maven tool
+
+Now we need to Integrate in our job pipeline
+
+Now add Maven tool & CAQ stage in Job pipeline like below
+
+pipeline {
+    agent any
+    tools {
+        maven 'mymaven'
+    }
+    stages {
+        stage ("Code") {
+            steps {
+                git 'https://github.com/pranay-devops666/dockerwebapp.git'
+            }
+        }
+        stage ("CAQ") {
+            steps {
+                withSonarQubeEnv('mysonar') {
+                    sh "mvn clean verify sonar:sonar -Dsonar.projectKey=MyProject"
+                }
+            }
+        }
+    }
+}
+
+save & Build the Job
+
+Build Job got success -----------> Sonarqube CAQ Stage has done 
+
+
+
+Now Build stage 
+
+pipeline {
+    agent any
+    tools {
+        maven 'mymaven'
+    }
+    stages {
+        stage ("Code") {
+            steps {
+                git 'https://github.com/pranay-devops666/dockerwebapp.git'
+            }
+        }
+        stage ("CAQ") {
+            steps {
+                withSonarQubeEnv("mysonar") {
+                    sh "mvn clean verify sonar:sonar -Dsonar.projectKey=MyProject"
+                }
+            }
+        }
+        stage ("Build") {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+    }
+}
+
+
+save & Build the Job
+
+Build Job got success 
+
+Now Artifacts (nexusArtifactUploader)
+
+
+
+
+
+
+
 
 
 
