@@ -771,18 +771,102 @@ now we need to push the image into this created repo in dockerhub
 
 go to ec2-instance
 
+[root@ip-172-31-90-22 Docker-app]# docker images -----------------------------------> command to view list of images 
+REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
+dbimage      latest    485477282a4b   47 minutes ago   372MB
+appimage     latest    fc8586461e45   52 minutes ago   323MB
 
-docker tag appimage pranay413/myrepo:appimage
-docker tag appimage(image name) dockerhubusername/reponame tagname
+format to rename a Image is
+docker tag Imagename(which Image we want to do rename) usernameofDockerHub/RepoNameofDockerHub:giving tagname to the renaming the Image
 
-here we need to login in ec2-instance
+docker tag Imagename username/reponame:tag name
 
-docker login
-password: dockerhub password
+[root@ip-172-31-90-22 Docker-app]# docker tag appimage pranay419/myrepo:appimage -------------------> command to pull the created repository from DockerHub
+(docker tag -------> means renaming a image, pranay419-------> username of my DockerHub account, myrepo---------> repo name in DockerHub, :appimage-----> giving a
+tag name to the renaming the image)
+[root@ip-172-31-90-22 Docker-app]# docker images
+REPOSITORY         TAG        IMAGE ID       CREATED          SIZE
+dbimage            latest     485477282a4b   48 minutes ago   372MB
+appimage           latest     fc8586461e45   53 minutes ago   323MB
+pranay419/myrepo   appimage   fc8586461e45   53 minutes ago   323MB --------------> this is the rename Image
+[root@ip-172-31-90-22 Docker-app]#
 
-docker push pranay413/myrepo:appimage:appimage
+Now we need to push the Image to DockerHub
 
-image has been got pushed into a dockerhub
+first need to be login
+
+[root@ip-172-31-90-22 Docker-app]# docker login -------------------------------> command to login into a DockerHub
+Log in with your Docker ID or email address to push and pull images from Docker Hub. If you don't have a Docker ID, head over to https://hub.docker.com/ to create one.
+You can log in with your password or a Personal Access Token (PAT). Using a limited-scope PAT grants better security and is required for organizations using SSO. Learn more at https://docs.docker.com/go/access-tokens/
+
+Username: pranay419 -----------------> username of DockerHub
+Password: ---------------> need to give here DockerHub passwork (Password:Pranay@1409)
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+[root@ip-172-31-90-22 Docker-app]# docker push pranay419/myrepo:appimage ------------------------> command to push the Image to DockerHub
+The push refers to repository [docker.io/pranay419/myrepo]
+b48aea64179d: Pushed 
+5f70bf18a086: Pushed 
+8a513acb4745: Mounted from library/tomcat 
+b9353ef204ca: Mounted from library/tomcat 
+cb14ac22c631: Mounted from library/tomcat 
+b9eec3f79502: Mounted from library/tomcat 
+47a781906570: Mounted from library/tomcat 
+b4071ce2f2ea: Mounted from library/tomcat 
+21ea631b02cd: Mounted from library/tomcat 
+90c4c6bb3fef: Mounted from library/tomcat 
+5498e8c22f69: Mounted from library/tomcat 
+appimage: digest: sha256:dc9a75e345a80f0180c2701c5489367462260f138b47c302a09b21eab4cf5af8 size: 2622
+
+Login Succeeded
+
+Now go and check in DockerHub Image is got pushed or not?
+
+Image got pushed successfully
+
+Now need to be push DB Image also
+
+syntax to push the DB Image is
+
+docker tag dbimage pranay419/myrepo:dbimage -------------> syntax to push the DB Image 
+
+[root@ip-172-31-90-22 Docker-app]# docker images ---------------------------> command to view list of Images
+REPOSITORY         TAG        IMAGE ID       CREATED             SIZE
+dbimage            latest     485477282a4b   About an hour ago   372MB
+appimage           latest     fc8586461e45   About an hour ago   323MB
+pranay419/myrepo   appimage   fc8586461e45   About an hour ago   323MB
+[root@ip-172-31-90-22 Docker-app]# docker tag dbimage pranay419/myrepo:dbimage ---------------------------> command to rename a dbimage by using tag
+[root@ip-172-31-90-22 Docker-app]# docker images
+REPOSITORY         TAG        IMAGE ID       CREATED             SIZE
+pranay419/myrepo   dbimage    485477282a4b   About an hour ago   372MB
+dbimage            latest     485477282a4b   About an hour ago   372MB
+appimage           latest     fc8586461e45   About an hour ago   323MB
+pranay419/myrepo   appimage   fc8586461e45   About an hour ago   323MB
+[root@ip-172-31-90-22 Docker-app]# docker push pranay419/myrepo:dbimage ----------------------------> command to push the Image into a DockerHub
+The push refers to repository [docker.io/pranay419/myrepo]
+65e76bd6da59: Pushed 
+82582edf9553: Mounted from library/mysql 
+9209148debed: Mounted from library/mysql 
+364557e875f1: Mounted from library/mysql 
+5075b9328698: Mounted from library/mysql 
+97874ea0e7f9: Mounted from library/mysql 
+458d25c646d8: Mounted from library/mysql 
+ec41e34b35a0: Mounted from library/mysql 
+3437f67a712b: Mounted from library/mysql 
+0aa7d65147ef: Mounted from library/mysql 
+f411d8bde01c: Mounted from library/mysql 
+5dacd731af1b: Mounted from library/mysql 
+dbimage: digest: sha256:b5d3f5c21a6295406a415c5a4323930eb7aba54e8d1b896e89f442b49e7d576d size: 2829
+[root@ip-172-31-90-22 Docker-app]# 
+
+
+For suppose if we want to pull the Image from DockerHub to Ec2-Instance means following command is below
+
+docker pull pranay419/myrepo:dbimage---------------------------> command to pull the Image from DockerHub to Ec2-Instance
+
 
 
 
