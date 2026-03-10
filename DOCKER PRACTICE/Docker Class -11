@@ -1,7 +1,7 @@
 Docker Class -11
 
-TOPIC: DOCKER COMPOSE PART-2
-==============================
+TOPIC: DOCKER COMPOSE PART-2 (ADDING NETWORKSS & VOLUMES IN DOCKER-COMPOSE FILE)
+=======================================================================================
 
 DOCKER COMPOSE PART-2
 launch an instance-----> t3.micro-----> security group--------> ebs volume ------> 15-----> launch instance
@@ -16,6 +16,14 @@ sudo chmod +x /usr/local/bin/docker-compose
 # Create a symbolic link
 sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+sudo yum install -y python3-pip
+sudo pip3 install docker-compose
+docker-compose --version
+
 # Install using pip (Python package manager)
 sudo yum install -y python3-pip
 sudo pip3 install docker-compose
@@ -24,24 +32,24 @@ sudo pip3 install docker-compose
 docker-compose --version
 
 as of now upto docker-compose part-1 we learned 1. containers & 2. images in the 4 major pillars of docker-compose file
-now we will learn remaining 1. networks 4.volumes
+now we will learn remaining 3. networks 4.volumes
 how to integrate volumes & networks for  a docker-compose file
 
 lets see here
 
 vim compose.yml
+
 ---
 services:
-  dev:
+  devops:
     container_name: cont-1
     image: nginx
     ports:
       - "8081:80"
     volumes:
-      - appvolumes:/usr/share/nginx/html/
+      - appvolume:/usr/share/nginx/html/
 
-
-  aws:
+  azure:
     container_name: cont-2
     image: httpd
     ports:
@@ -50,13 +58,45 @@ services:
       - dbvolume:/usr/local/apache2/htdocs/
 
 volumes:
-  appvolumes:
+  appvolume:
   dbvolume:
 
+:wq
 
-docker-compose up -d
+[root@DOCKER-COMPOSE ~]# docker-compose up -d -------------------------> commamd to execute the docker-compose yaml file
+Creating network "root_default" with the default driver
+Creating volume "root_appvolume" with default driver
+Creating volume "root_dbvolume" with default driver
+Pulling devops (nginx:)...
+latest: Pulling from library/nginx
+206356c42440: Pull complete
+b47f187216b6: Pull complete
+1ad233904a11: Pull complete
+eedda9fd8786: Pull complete
+35ff83c394d6: Pull complete
+17d0911eaf62: Pull complete
+df0b66c867e4: Pull complete
+Digest: sha256:0236ee02dcbce00b9bd83e0f5fbc51069e7e1161bd59d99885b3ae1734f3392e
+Status: Downloaded newer image for nginx:latest
+Pulling azure (httpd:)...
+latest: Pulling from library/httpd
+206356c42440: Already exists
+7079f4501db6: Pull complete
+4f4fb700ef54: Pull complete
+242bb693a1d3: Pull complete
+80414dfb8f15: Pull complete
+47a6bbb8d6d8: Pull complete
+Digest: sha256:96b1e8f69ee3adde956e819f7a7c3e706edef7ad88a26a491734015e5c595333
+Status: Downloaded newer image for httpd:latest
+Creating cont-2 ... done
+Creating cont-1 ... done
+[root@DOCKER-COMPOSE ~]#
 
-docker volume ls
+[root@DOCKER-COMPOSE ~]# docker volume ls
+DRIVER    VOLUME NAME
+local     root_appvolume
+local     root_dbvolume
+[root@DOCKER-COMPOSE ~]#
 
 
 now we can access the application
@@ -65,7 +105,50 @@ http://54.91.101.57:8082/
 
 now if we want to keep the code or data means we need to go volume default path
 
-cd /var/lib/docker/volumes/root_appvolumes/_data
+cd /var/lib/docker/volumes/root_appvolumes/_data -------------------------------------> command to go to  docker volumes default path
+
+
+
+[root@DOCKER-COMPOSE ~]# cd /var/lib/docker/volumes/
+[root@DOCKER-COMPOSE volumes]# ll
+total 24
+brw-------. 1 root root 259, 1 Mar 10 11:18 backingFsBlockDev
+-rw-------. 1 root root  32768 Mar 10 11:19 metadata.db
+drwx-----x. 3 root root     19 Mar 10 11:19 root_appvolume
+drwx-----x. 3 root root     19 Mar 10 11:19 root_dbvolume
+[root@DOCKER-COMPOSE volumes]# cd root_appvolume/_data
+[root@DOCKER-COMPOSE _data]# ll
+total 8
+-rw-r--r--. 1 root root 497 Feb  4 15:12 50x.html
+-rw-r--r--. 1 root root 615 Feb  4 15:12 index.html
+[root@DOCKER-COMPOSE _data]# vim index.html 
+[root@DOCKER-COMPOSE _data]# vim index.html 
+[root@DOCKER-COMPOSE _data]# ll
+total 8
+-rw-r--r--. 1 root root 497 Feb  4 15:12 50x.html
+-rw-r--r--. 1 root root 617 Mar 10 11:23 index.html
+[root@DOCKER-COMPOSE _data]# cd ..
+[root@DOCKER-COMPOSE root_appvolume]# ll
+total 0
+drwxr-xr-x. 2 root root 40 Mar 10 11:23 _data
+[root@DOCKER-COMPOSE root_appvolume]# cd ..
+[root@DOCKER-COMPOSE volumes]# ll
+total 24
+brw-------. 1 root root 259, 1 Mar 10 11:18 backingFsBlockDev
+-rw-------. 1 root root  32768 Mar 10 11:19 metadata.db
+drwx-----x. 3 root root     19 Mar 10 11:19 root_appvolume
+drwx-----x. 3 root root     19 Mar 10 11:19 root_dbvolume
+[root@DOCKER-COMPOSE volumes]# cd root_dbvolume/
+[root@DOCKER-COMPOSE root_dbvolume]# ll
+total 0
+drwxr-xr-x. 2 root root 24 Mar 10 11:19 _data
+[root@DOCKER-COMPOSE root_dbvolume]# cd _data/
+[root@DOCKER-COMPOSE _data]# ll
+total 4
+-rw-r--r--. 1 501 ftp 191 Nov  7 08:23 index.html
+[root@DOCKER-COMPOSE _data]# vim index.html 
+[root@DOCKER-COMPOSE _data]# 
+
 
 vim index.html
 in this file here we will make changes
@@ -88,7 +171,15 @@ before going to do down all the containers why because if we execute again this 
 
 
 
-docker-compose down
+[root@DOCKER-COMPOSE ~]# docker-compose down -----------------> command to down all the services
+Stopping cont-1 ... done
+Stopping cont-2 ... done
+Removing cont-1 ... done
+Removing cont-2 ... done
+Removing network root_default
+[root@DOCKER-COMPOSE ~]# 
+
+
 all containers got deleted here
 
 now we will write docker-compose file to create networks
@@ -97,18 +188,17 @@ now we will write docker-compose file to create networks
 vim compose.yml
 ---
 services:
-  dev:
+  devops:
     container_name: cont-1
     image: nginx
     ports:
       - "8081:80"
     volumes:
-      - appvolumes:/usr/share/nginx/html/
+      - appvolume:/usr/share/nginx/html/
     networks:
       - appnetwork
 
-
-  aws:
+  azure:
     container_name: cont-2
     image: httpd
     ports:
@@ -119,7 +209,7 @@ services:
       - dbnetwork
 
 volumes:
-  appvolumes:
+  appvolume:
   dbvolume:
 
 networks:
@@ -131,46 +221,99 @@ networks:
 :wq
 
 
-docker-compose up -d
+[root@DOCKER-COMPOSE ~]# vim compose.yml 
+[root@DOCKER-COMPOSE ~]# docker-compose up -d
+Creating network "root_appnetwork" with driver "bridge"
+Creating network "root_dbnetwork" with driver "bridge"
+Creating cont-2 ... done
+Creating cont-1 ... done
+[root@DOCKER-COMPOSE ~]# 
 
-docker-compose ps -a
-docker-compose ps
+[root@DOCKER-COMPOSE ~]# docker-compose ps -a
+ Name               Command               State                  Ports                
+--------------------------------------------------------------------------------------
+cont-1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:8081->80/tcp,:::8081->80/tcp
+cont-2   httpd-foreground                 Up      0.0.0.0:8082->80/tcp,:::8082->80/tcp
+[root@DOCKER-COMPOSE ~]#
 
-docker network ls
+[root@DOCKER-COMPOSE ~]# docker network ls
+NETWORK ID     NAME              DRIVER    SCOPE
+a1927f793dd7   bridge            bridge    local
+772dd402f619   host              host      local
+3d2f153830b5   none              null      local
+6169d0e20fab   root_appnetwork   bridge    local
+03d55dbf00d7   root_dbnetwork    bridge    local
+[root@DOCKER-COMPOSE ~]#
 
 we need to do connection here network to network how mens below
 
 first need to check pinging or not
 
-docker inspect cont-1
-copy cony-1 IP
+[root@DOCKER-COMPOSE ~]# docker inspect cont-1
+copy cont-1 IP
 
-docker exec -it cont-1 bash
+IP of Cont-1 ------> 172.19.0.2
+IP of Cont-1 ------> 172.20.0.2
 
-apt update -y
+[root@DOCKER-COMPOSE ~]# docker exec -it cont-1 bash--------------------> 
+root@316b10be38b5:/# apt update -y ---------------------------------------->
+Get:1 http://deb.debian.org/debian trixie InRelease [140 kB]
+Get:2 http://deb.debian.org/debian trixie-updates InRelease [47.3 kB]
+Get:3 http://deb.debian.org/debian-security trixie-security InRelease [43.4 kB]
+Get:4 http://deb.debian.org/debian trixie/main amd64 Packages [9670 kB]
+Get:5 http://deb.debian.org/debian trixie-updates/main amd64 Packages [5412 B]
+Get:6 http://deb.debian.org/debian-security trixie-security/main amd64 Packages [108 kB]
+Fetched 10.0 MB in 1s (13.5 MB/s)               
+All packages are up to date.    
+root@316b10be38b5:/# apt install iputils-ping -y -----------------------------------------> 
+Installing:                     
+  iputils-ping
 
-apt install iputils-ping -y
+Installing dependencies:
+  linux-sysctl-defaults
 
-ping 172.19.0.2
+Summary:
+  Upgrading: 0, Installing: 2, Removing: 0, Not Upgrading: 0
+  Download size: 56.9 kB
+  Space needed: 211 kB / 24.3 GB available
+
+Get:1 http://deb.debian.org/debian trixie/main amd64 iputils-ping amd64 3:20240905-3 [51.2 kB]
+Get:2 http://deb.debian.org/debian trixie/main amd64 linux-sysctl-defaults all 4.12 [5624 B]
+Fetched 56.9 kB in 0s (4046 kB/s)               
+debconf: unable to initialize frontend: Dialog
+debconf: (No usable dialog-like program is installed, so the dialog based frontend cannot be used. at /usr/share/perl5/Debconf/FrontEnd/Dialog.pm line 79, <STDIN> line 2.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 2.)
+debconf: falling back to frontend: Teletype
+Selecting previously unselected package iputils-ping.
+(Reading database ... 6706 files and directories currently installed.)
+Preparing to unpack .../iputils-ping_3%3a20240905-3_amd64.deb ...
+Unpacking iputils-ping (3:20240905-3) ...
+Selecting previously unselected package linux-sysctl-defaults.
+Preparing to unpack .../linux-sysctl-defaults_4.12_all.deb ...
+Unpacking linux-sysctl-defaults (4.12) ...
+Setting up linux-sysctl-defaults (4.12) ...
+Setting up iputils-ping (3:20240905-3) ...
+root@316b10be38b5:/#  ping 172.19.0.2---------------------->
 
 ctrl+p+q
 
 vim compose.yml
 ---
 services:
-  dev:
+  devops:
     container_name: cont-1
     image: nginx
     ports:
       - "8081:80"
     volumes:
-      - appvolumes:/usr/share/nginx/html/
+      - appvolume:/usr/share/nginx/html/
     networks:
       - appnetwork
       - dbnetwork
 
-
-  aws:
+  azure:
     container_name: cont-2
     image: httpd
     ports:
@@ -182,7 +325,7 @@ services:
       - appnetwork
 
 volumes:
-  appvolumes:
+  appvolume:
   dbvolume:
 
 networks:
@@ -193,11 +336,18 @@ networks:
 
 :wq
 
-docker-compose up -d
+[root@DOCKER-COMPOSE ~]# vim compose.yml  --------------------> 
+[root@DOCKER-COMPOSE ~]# docker-compose up -d ------------------> 
+Recreating cont-2 ... done
+Recreating cont-1 ... done
+[root@DOCKER-COMPOSE ~]# 
 
 now go to cont-1 and check with ping
 
-it is ow recreated again we need to install ping package in the container
+IP of cont-1 172.20.0.3
+IP of cont-2 172.20.0.2
+
+it is now recreated again we need to install ping package in the container
 
 docker exec -it cont-1 bash
 
@@ -225,11 +375,13 @@ it is pinging working fine
 now if bymistake container got deleted here means 
 in here if the one container got deleted means i need to get automatically container another one 
 
-lets do that automationis called as self healing
+lets do that automations called as self healing
 
-for that we need to use replicas in sam compose file
+for that we need to use replicas in same compose file
+=========================================================
 
 replicas means no of containers
+====================================
 
 vim compose.yml
 ---
@@ -272,7 +424,7 @@ networks:
 
 :wq
 
-docker-compose up -d
+docker-compose up -d ---------------------------------------> 
 
 
 now i want to increase no of containers here in 2 ways
@@ -322,6 +474,32 @@ networks:
 :wq
 
 
+[root@DOCKER-COMPOSE ~]# docker-compose up -d
+Recreating cont-1 ... done
+Recreating cont-2      ... done
+Creating root_devops_2 ... done
+Creating root_devops_3 ... done
+Creating root_azure_2  ... done
+Creating root_azure_3  ... done
+[root@DOCKER-COMPOSE ~]# docker-compose ps
+    Name                   Command               State                   Ports                 
+-----------------------------------------------------------------------------------------------
+root_azure_1    httpd-foreground                 Up      0.0.0.0:32771->80/tcp,:::32771->80/tcp
+root_azure_2    httpd-foreground                 Up      0.0.0.0:32773->80/tcp,:::32773->80/tcp
+root_azure_3    httpd-foreground                 Up      0.0.0.0:32774->80/tcp,:::32774->80/tcp
+root_devops_1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:32768->80/tcp,:::32768->80/tcp
+root_devops_2   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:32769->80/tcp,:::32769->80/tcp
+root_devops_3   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:32770->80/tcp,:::32770->80/tcp
+[root@DOCKER-COMPOSE ~]#
+
+
+======================================================================================================================================================================
+NOTE: NEED TO BE REMEBMER IN DOCKER-COMPOSE IS THERE IS NO SELF-HEALING 
+(Self healing means if the container got deleted means another container should be create automatically its not gonna happen in docker-compose) 
+IN DOCKER-COMPOSE TO GET RID OF THIS PROBLEM WE WILL USE KUBERNETES
+========================================================================================================================================================================
+
+
 technically we called as it is "scale-in" increasing the no.of containers
 if suppose decreasing the no.of containers called as "scale-out"
 
@@ -330,14 +508,14 @@ decrease replicas: here in compose file
 
 through command 
 
-docker-compose up --scale dev=4 -d
+docker-compose up --scale dev=4 -d ---------------------------------> 
 # here dev means service name
 
 technically called it as scaling based on the request we can either increase or decrease the no.of systems/containers
 
 as of now we done manual way only
 
-scaling ha stwo types
+scaling has two types
 1. manual scaling---------> mentioning here how many replicas need to give here in compose file
 2. auto scaling -----------> for example plenty of users are going accessing means no.of requets increasing means need to increase no of containers automatically
 to handle the request
@@ -357,4 +535,5 @@ in docker-compose all need to be proficient to integrate all these below 4 using
 3.networks
 4.volumes
 
- 
+
+
