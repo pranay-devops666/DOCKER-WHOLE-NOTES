@@ -1,7 +1,7 @@
 Docker Class -10
 
-TOPIC: DOCKER COMPOSE PART-1
-================================
+TOPIC: DOCKER COMPOSE PART-1 (CREATING SERVICES, BUILDING IMAGES, CREATING SERVICES THROUGH THE IMAGES FROM DOCKERHUB & LOCAL HOST IMAGES) 
+=============================================================================================================================================
 
 DOCKER COMPOSE PART-1
 
@@ -62,7 +62,9 @@ now write file for docker-compose
 docker-compose file must be a specific name like compose.yml, compose.yaml, docker-compose.yml, docker-compose.yaml
 these 4 formats will be spcific
 
-vim docker-compose
+vim docker-compose.yml
+
+we are creating docker-compose to create multiple services, for suppose if we create one service means that service will create one container
 
 yaml file starts with ---
 
@@ -86,16 +88,64 @@ services:
 
   bank:
     container_name: cont3
-    image: shaikmustafa/paytm:bank
+    image: /paytm:bank
     ports:
-      - "8083:80"
+      - "808shaikmustafa3:80"
+
+:wq ---------------------------> save and exit in this file 
+
 
 save and exit in this file 
 
 now execute this docker compose file
 if we need to execute this compose file means command was docker-compose up -d
 
-docker-compose up -d
+docker-compose up -d -------------------> command to execute docker-compose yamlfile
+
+[root@DOCKER-COMPOSE ~]# docker-compose up -d -------------------> command to execute docker-compose yamlfile
+Creating network "root_default" with the default driver
+Pulling movie (shaikmustafa/paytm:movie)...
+movie: Pulling from shaikmustafa/paytm
+d107e437f729: Pull complete
+cb497a329a81: Pull complete
+f1c4d397f477: Pull complete
+f72106e86507: Pull complete
+899c83fc198b: Pull complete
+a785b80f5a67: Pull complete
+6c50e4e0c439: Pull complete
+52fda3c2debf: Pull complete
+Digest: sha256:df46048f8d9500ecfb1ff9ab5ad12e457883bde82f57b8ba8d9e761cd92005fa
+Status: Downloaded newer image for shaikmustafa/paytm:movie
+Pulling bus (shaikmustafa/paytm:bus)...
+bus: Pulling from shaikmustafa/paytm
+d107e437f729: Already exists
+cb497a329a81: Already exists
+f1c4d397f477: Already exists
+f72106e86507: Already exists
+899c83fc198b: Already exists
+a785b80f5a67: Already exists
+6c50e4e0c439: Already exists
+7ab488589185: Pull complete
+Digest: sha256:3c4934aa280644f9da7d6e7b67fe7d1092cf82fd02e0460400d9ad1a43621c40
+Status: Downloaded newer image for shaikmustafa/paytm:bus
+Pulling bank (shaikmustafa/paytm:bank)...
+bank: Pulling from shaikmustafa/paytm
+d107e437f729: Already exists
+cb497a329a81: Already exists
+f1c4d397f477: Already exists
+f72106e86507: Already exists
+899c83fc198b: Already exists
+a785b80f5a67: Already exists
+6c50e4e0c439: Already exists
+1aef59813403: Pull complete
+Digest: sha256:c6e00859471831c37b63faa19b0f4df31215fafecaddb306512de2f62576b321
+Status: Downloaded newer image for shaikmustafa/paytm:bank
+Creating cont2 ... done
+Creating cont3 ... done
+Creating cont1 ... done
+[root@DOCKER-COMPOSE ~]# 
+
+above are following output for the docker-compose yaml file
 
 after executing this docker-compose file 
 seperate network will be created in name as root_default for all these services of docker-compose file
@@ -108,8 +158,23 @@ if we give this command means (docker ps )we can see manually created containers
 
 now i want to see the containers which are created by after executing the docker-compose file only command was
 
-docker-compose ps
-
+[root@DOCKER-COMPOSE ~]# docker-compose ps   ----------------> command to view list of containers created in docker-compose
+Name               Command               State                  Ports                
+-------------------------------------------------------------------------------------
+cont1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:8081->80/tcp,:::8081->80/tcp
+cont2   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:8082->80/tcp,:::8082->80/tcp
+cont3   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:8083->80/tcp,:::8083->80/tcp
+[root@DOCKER-COMPOSE ~]# docker-compose ps -a ----------------> command to view list of running containers created in docker-compose
+Name               Command               State                  Ports                
+-------------------------------------------------------------------------------------
+cont1   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:8081->80/tcp,:::8081->80/tcp
+cont2   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:8082->80/tcp,:::8082->80/tcp
+cont3   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:8083->80/tcp,:::8083->80/tcp
+[root@DOCKER-COMPOSE ~]# docker-compose ps -a -q ----------------> command to view list of running containers with IDscreated in docker-compose
+08c372e12d753e45592837c744212ed79a3044f4deb026199474f88889f1821b
+4e7d28a9b13e9096fad17ad667099ad53d680d80f9de697ab79a0bfb50469c1e
+a03ca8a2494c6ca0f19a094f81194876ec2037993dbb5e4f266d88b9455648a5
+[root@DOCKER-COMPOSE ~]#
 now we can access the appication by ece-instance publicIP:container number
 
 http://18.213.4.140:8081/
@@ -122,13 +187,28 @@ for suppose if we have the code in local system means
 
 remove the file what we created above ----->docker-compose.yml
 
-rm -rf *
+[root@DOCKER-COMPOSE ~]# rm -rf * ----------------> command to remove all files at a time
 
-mkdir swiggy
+mkdir swiggy ---------------> command to create a folder 
 
-cd swiggy/
+cd swiggy/ -----------------> command to go to swiggy folder 
 
 mkdir instamart food-delivery genie dineout
+
+[root@DOCKER-COMPOSE ~]# mkdir swiggy
+[root@DOCKER-COMPOSE ~]# cd swiggy/
+[root@DOCKER-COMPOSE swiggy]# mkdir instamart food-delivery genie dineout
+[root@DOCKER-COMPOSE swiggy]# ls
+dineout  food-delivery  genie  instamart
+[root@DOCKER-COMPOSE swiggy]# ll
+total 0
+drwxr-xr-x. 2 root root 6 Mar 10 08:57 dineout
+drwxr-xr-x. 2 root root 6 Mar 10 08:57 food-delivery
+drwxr-xr-x. 2 root root 6 Mar 10 08:57 genie
+drwxr-xr-x. 2 root root 6 Mar 10 08:57 instamart
+[root@DOCKER-COMPOSE swiggy]#
+
+
 
 for these 4 services we need to write the code
 1. instamart 
@@ -224,7 +304,7 @@ what we need to need to create services means image
 
 first need to build the images
 
-docker build -t dineout-img dineout(here dineout-img------> image name and  dineout-----> folder name where the Dockerfile & code file exist)
+docker build -t dineout-img dineout -------------> (here dineout-img------> image name and  dineout-----> folder name where the Dockerfile & code file exist)
 
 image willl be created now
 
@@ -233,6 +313,18 @@ docker build -t food-delivery-img food-delivery
 docker build -t genie-img genie
 
 docker build -t instamart-img instamart
+
+
+[root@DOCKER-COMPOSE swiggy]# docker images
+REPOSITORY           TAG       IMAGE ID       CREATED          SIZE
+instamart-img        latest    b96197e17103   14 seconds ago   161MB
+genie-img            latest    7fae5953c9cb   23 seconds ago   161MB
+food-delivery-img    latest    1206bae07f45   33 seconds ago   161MB
+dineout-img          latest    8d45fe70a8cb   55 seconds ago   161MB
+shaikmustafa/paytm   movie     970451da1188   5 months ago     192MB
+shaikmustafa/paytm   bus       8fd2e88fb961   5 months ago     192MB
+shaikmustafa/paytm   bank      1f4b6c4ed9ae   5 months ago     192MB
+[root@DOCKER-COMPOSE swiggy]# 
 
 all images got created
 
@@ -275,9 +367,20 @@ previosly written docker-compose and now written docker-compose the difference i
 previously written docker-compose file we used image and taken image from dockerhub
 now we taken image from locally in our system in a particular path
 
-docker-compose up -d
-
-docker-compose ps
+[root@DOCKER-COMPOSE swiggy]# docker-compose up -d
+Creating network "swiggy_default" with the default driver
+Creating genie         ... done
+Creating dineout-cont  ... done
+Creating food-delivery ... done
+Creating instamart     ... done
+[root@DOCKER-COMPOSE swiggy]# docker-compose ps
+    Name                   Command               State                  Ports                
+---------------------------------------------------------------------------------------------
+dineout-cont    /docker-entrypoint.sh ngin ...   Up      0.0.0.0:1111->80/tcp,:::1111->80/tcp
+food-delivery   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:2222->80/tcp,:::2222->80/tcp
+genie           /docker-entrypoint.sh ngin ...   Up      0.0.0.0:3333->80/tcp,:::3333->80/tcp
+instamart       /docker-entrypoint.sh ngin ...   Up      0.0.0.0:4444->80/tcp,:::4444->80/tcp
+[root@DOCKER-COMPOSE swiggy]# 
 
 now we can access the appication by ece-instance publicIP:container number
 
@@ -295,7 +398,11 @@ if we done made changes in a service means first we need to do build the Dockerf
 
 if we done here means how it will looks lets see
 
-cd instamart/
+[root@DOCKER-COMPOSE swiggy]# cd instamart/  ------------------------------> 
+[root@DOCKER-COMPOSE instamart]# vim index.html  ---------------------------> 
+[root@DOCKER-COMPOSE instamart]# cd ..
+[root@DOCKER-COMPOSE swiggy]# docker build -t instamart-img instamart ----------------------> 
+[+] Building 0.3s (7/7) FINISHED
 
 vim index.html
 
@@ -306,14 +413,14 @@ here we made code changes in instamart service
 when ever we done made changes the code in a particular service means 
 we need to build the Dockerfile again
 
-docker build -t instamart-img instamart
+docker build -t instamart-img instamart ---------------------------------> 
 
 now the question is the newly made changes will come into a service?
 NO
 
 if we need to get it means again we need to execute docker-compose file
 
-docker-compose up -d
+docker-compose up -d--------------------> 
 
 [root@ip-172-31-25-199 swiggy]# docker-compose up -d
 Recreating instamart ... 
@@ -342,7 +449,16 @@ now we can do it practically
 
 remove all the containers created from the docker-compose
 
-docker-compose down------> command to delete containers created by docker-compose
+[root@DOCKER-COMPOSE swiggy]# docker-compose down -----------------> command to delete containers created by docker-compose
+Stopping instamart     ... done
+Stopping food-delivery ... done
+Stopping dineout-cont  ... done
+Stopping genie         ... done
+Removing instamart     ... done
+Removing food-delivery ... done
+Removing dineout-cont  ... done
+Removing genie         ... done
+Removing network swiggy_default
 
 docker rm $(docker ps -a -q)
 
@@ -383,9 +499,24 @@ services:
 
 save & exit
 
-docker-compose build
+[root@DOCKER-COMPOSE swiggy]# docker-compose build
+Building dineout
+[+] Building 0.2s (7/7) FINISHED 
+Building food-delivery
+[+] Building 0.2s (7/7) FINISHED
+Building genie
+[+] Building 0.2s (7/7) FINISHED
+Building instamart
+[+] Building 0.2s (7/7) FINISHED
 
-docker-compose up -d
+
+[root@DOCKER-COMPOSE swiggy]# docker-compose up -d
+Creating network "swiggy_default" with the default driver
+Creating dineout-cont  ... done
+Creating food-delivery ... done
+Creating genie         ... done
+Creating instamart     ... done
+[root@DOCKER-COMPOSE swiggy]# 
 
 services has been created with these simple comands
 
