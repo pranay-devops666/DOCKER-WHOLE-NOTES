@@ -1,7 +1,7 @@
 Docker Class -09
 
-TOPIC: DOCKER NETWORKS
-==========================
+TOPIC: DOCKER NETWORKS (CREATING NETWORKS, ATTACHING NETWORKS & DISCONNECTING NETWORKS & PINGING NETWORKS)
+=============================================================================================================
 
 DOCKER NETWORKS
 
@@ -13,24 +13,30 @@ launch one instance -------> t3.micro---->keypair---->sg------>8gb-----> launch 
 
 install docker in it
 
-yum install docker -y && systemctl start docker
+yum install docker -y && systemctl start docker -------------------------------------> command to install docker and restart docker as well
 
 containers have IP adress, how do we know means by inspecting it
 
-docker inspect containername
+docker inspect containername --------------------------------------> command to know the full information of a container
 
 for a container IP address will come form Network only
 
-docker network ls
-# command to see list of networks
+[root@DOCKER-NETWORK ~]# docker network ls----------------------------------> command to see list of networks
+NETWORK ID     NAME      DRIVER    SCOPE
+378bc82df7cf   bridge    bridge    local
+7d02ec8421bd   host      host      local
+7ec87714377c   none      null      local
+[root@DOCKER-NETWORK ~]#
 
 now create one container like below
 
-docker run -itd --name containername -p 1111:80 nginx
-
-docker inspect containername
+[root@DOCKER-NETWORK ~]# docker run -itd --name containername -p 1111:80 nginx-----------------------> command to create a container
+be865992df123b8b58c90e8b08571b07d2d201db5b0391dc01fa2e27304f1dae
+[root@DOCKER-NETWORK ~]# docker inspect containername -------------------------------------> command to know the full information of a container
 
 types of network 
+=====================
+
 1. bridge network
 2. host network
 3. none network
@@ -39,14 +45,17 @@ bridge network is the defult network in docker
 
 bridge network provide the IP address to the container
 
-host network -------> if we want to share configrations to containers in that case we can use host network
+host network-------> if we want to share configurations to containers in that case we can use host network
+=============== 
 host network is used to share the network configurations with the container
 
 none network--------->  it means i dont want any network to my container
+============
 we can't get network configurations if we choose none network means and it will be presnt within the server only and can't expose to outside
 mostly it will be used in database server containers
 
-OVERLAY network------>means i have 2 docker hosts and  having 2 different containers in both hosts and not having communicate conatiners to containers each other 
+OVERLAY network------>means i have 2 docker hosts and  having 2 different containers in both hosts and not having communicate conatiners to containers each other
+===============
 in this case we can use OVERLAY network to communicate the container to containers each other from different hosts
 ex: application container has present in one server, database container has present in another server, in here generally application must be communicate to databse
 then now only all data will be store in database container so in that case network is not allowing means data can't be stored in the database 
@@ -54,13 +63,23 @@ in that case stuation we can use OVERLAY network we use.
 
 overlay network is used to establish a connection between the containers which are present in different hosts.
 
-docker run -itd --name containername -p 2222:80 --network=host nginx
+[root@DOCKER-NETWORK ~]# docker run -itd --name containername1 -p 2222:80 --network=host nginx----> command to create a network with a specific network along with container
+WARNING: Published ports are discarded when using host network mode
+d0e90839717605d1979e1a167f2b07368563b45a0d79832abb60ec2f52de275b
+[root@DOCKER-NETWORK ~]# 
+Here Discarded means remove
+
+[root@DOCKER-NETWORK ~]# docker run -itd --name cont4 -p 4444:80 --network=host httpd -----------> command to create a network with a specific network along with container
+Status: Downloaded newer image for httpd:latest
+WARNING: Published ports are discarded when using host network mode
+7ddfc750b254f7463e966f560442cd7f372efc3f1042d9c12223992da4861072
 
 if we mention --network while  creating a container it will be create in specific network or else it will be create on default bridge network
 
 lets discuss in real time in which situation we can use is
 
-for example we have application container, database container as well so application container must be communicate to db container and db container must be communicate with app cpnt as well
+for example we have application container, database container as well so application container must be communicate to db container and db container 
+must be communicate with app container as well
 
 generally we can connect one system to another system is like wired or wireless
 
@@ -68,48 +87,156 @@ ex: LAN wifi connecting through IP
 
 lets do in practical way
 
-docker network ls
+[root@DOCKER-NETWORK ~]# docker network ls   ---------------------------> command to view list of networks
+NETWORK ID     NAME      DRIVER    SCOPE
+378bc82df7cf   bridge    bridge    local
+7d02ec8421bd   host      host      local
+7ec87714377c   none      null      local
+[root@DOCKER-NETWORK ~]# 
 
-docker network create app-network
-docker network create db-network
+[root@DOCKER-NETWORK ~]# docker network create app-network   ----------------------> command to create a network with  name app-network
+eb2cb95fa1dc7e3eafb817d686c6c2df3f38e0080cf6ed040f31e96017a1519f
+[root@DOCKER-NETWORK ~]# 
+[root@DOCKER-NETWORK ~]# docker network create db-network ----------------------> command to create a network with  name db-network
+80b5ac66aac20212f24bd18cfffb70233302745c91100f5ba20da9ef2ce9cfdd
+[root@DOCKER-NETWORK ~]# 
 
-now we will create app-cont in app-network and  will create db-cont in db-network as well like below
+now we will create app-container in app-network and  will create db-container in db-network as well like below
+=====================================================================================================================
 
-docker run -itd --name app-cont -p 1122:80 --network app-network nginx 
+[root@DOCKER-NETWORK ~]# docker run -itd --name app-cont -p 1122:80 --network app-network nginx -------------------------> command to create a network with name app-network
+fa681bef06f425edce835820fdef0afee87f24099dcada7a0fb9fc5023d26d7e
+[root@DOCKER-NETWORK ~]#  -
 
-docker ps
+[root@DOCKER-NETWORK ~]# docker ps   --------------------> command to view list of containers
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+fa681bef06f4   nginx     "/docker-entrypoint.…"   32 seconds ago   Up 30 seconds   0.0.0.0:1122->80/tcp, :::1122->80/tcp   app-cont
+d0e908397176   nginx     "/docker-entrypoint.…"   14 minutes ago   Up 14 minutes                                           containername1
+be865992df12   nginx     "/docker-entrypoint.…"   20 minutes ago   Up 20 minutes   0.0.0.0:1111->80/tcp, :::1111->80/tcp   containername
+[root@DOCKER-NETWORK ~]#  docker inspect app-cont ----------------------> command to view full information of a container with name app-count
 
-docker inspect app-cont
-
-docker run -itd --name db-cont -p 1122:80 --network db-network nginx 
-
-docker ps
-
-docker inspect app-cont
+[root@DOCKER-NETWORK ~]# docker run -itd --name db-container -p 2233:80 --network db-network nginx  -------------------> command to create a container with network name db-network
+7644c2cdd9c35e14d7f6f0ab8875342d27eb27d9460075d65e92acc7bafde250
+[root@DOCKER-NETWORK ~]# docker inspect db-container ----------------------> command to view full information of a container with name db-countainer
 
 now these created 2 networks will get communicate each other by default ? ------> no
 
 how to check like below
+=========================
 
-do inspect app-cont
+[root@DOCKER-NETWORK ~]# docker inspect app-cont ----------------------> command to view full information of a container with name app-count
 
-docker inspect app-cont copy the IP and keep a side and db-cont IP  as well
+docker inspect app-cont copy the IP of app-cont IP (172.18.0.2)and keep a side and db-cont IP  as well like below
+
+docker inspect db-container copy the IP of db-container IP (172.19.0.2)and keep a side and db-cont IP  as well
+
 
 how to check the app-cont and db-cont is getting communicate each others is 
+===================================================================================
 
 need to be ping here like below
 
 first go to app-cont 
 
-docker exec -it app-cont bash
+[root@DOCKER-NETWORK ~]# docker exec -it app-cont bash -----------------------> command to go to enter into a app-cont
+root@fa681bef06f4:/# apt update -y --------------------------------> command to update apt inside a container
+Get:1 http://deb.debian.org/debian trixie InRelease [140 kB]
+Get:2 http://deb.debian.org/debian trixie-updates InRelease [47.3 kB]
+Get:3 http://deb.debian.org/debian-security trixie-security InRelease [43.4 kB]
+Get:4 http://deb.debian.org/debian trixie/main amd64 Packages [9670 kB]
+Get:5 http://deb.debian.org/debian trixie-updates/main amd64 Packages [5412 B]
+Get:6 http://deb.debian.org/debian-security trixie-security/main amd64 Packages [108 kB]
+Fetched 10.0 MB in 1s (14.7 MB/s)               
+All packages are up to date.    
+root@fa681bef06f4:/# apt install iputils-ping -y -----------------------------------------> command to install ping package inside of a container 
+Installing:                     
+  iputils-ping
 
-need to install ping package here inside the container
+Installing dependencies:
+  linux-sysctl-defaults
 
-apt update -y
+Summary:
+  Upgrading: 0, Installing: 2, Removing: 0, Not Upgrading: 0
+  Download size: 56.9 kB
+  Space needed: 211 kB / 24.3 GB available
 
-apt install iputils-ping -y
+Get:1 http://deb.debian.org/debian trixie/main amd64 iputils-ping amd64 3:20240905-3 [51.2 kB]
+Get:2 http://deb.debian.org/debian trixie/main amd64 linux-sysctl-defaults all 4.12 [5624 B]
+Fetched 56.9 kB in 0s (4264 kB/s)               
+debconf: unable to initialize frontend: Dialog
+debconf: (No usable dialog-like program is installed, so the dialog based frontend cannot be used. at /usr/share/perl5/Debconf/FrontEnd/Dialog.pm line 79, <STDIN> line 2.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 2.)
+debconf: falling back to frontend: Teletype
+Selecting previously unselected package iputils-ping.
+(Reading database ... 6706 files and directories currently installed.)
+Preparing to unpack .../iputils-ping_3%3a20240905-3_amd64.deb ...
+Unpacking iputils-ping (3:20240905-3) ...
+Selecting previously unselected package linux-sysctl-defaults.
+Preparing to unpack .../linux-sysctl-defaults_4.12_all.deb ...
+Unpacking linux-sysctl-defaults (4.12) ...
+Setting up linux-sysctl-defaults (4.12) ...
+Setting up iputils-ping (3:20240905-3) ...
+root@fa681bef06f4:/# ping 172.18.0.2 -----------------------------> here give the ping command and IP address of db-countainer container network IP
+^C
+--- 172.18.0.2 ping statistics ---
+66 packets transmitted, 66 received, 0% packet loss, time 67605ms
+rtt min/avg/max/mdev = 0.024/0.042/0.046/0.003 ms
 
-now give ping here
+
+ctrl+c -----------> to stop pinging
+
+Not pinging here
+
+[root@DOCKER-NETWORK ~]# docker exec -it db-container bash
+root@7644c2cdd9c3:/# apt update -y
+Get:1 http://deb.debian.org/debian trixie InRelease [140 kB]
+Get:2 http://deb.debian.org/debian trixie-updates InRelease [47.3 kB]
+Get:3 http://deb.debian.org/debian-security trixie-security InRelease [43.4 kB]
+Get:4 http://deb.debian.org/debian trixie/main amd64 Packages [9670 kB]
+Get:5 http://deb.debian.org/debian trixie-updates/main amd64 Packages [5412 B]
+Get:6 http://deb.debian.org/debian-security trixie-security/main amd64 Packages [108 kB]
+Fetched 10.0 MB in 1s (14.8 MB/s)               
+All packages are up to date.    
+root@7644c2cdd9c3:/# apt install iputils-ping -y
+Installing:                     
+  iputils-ping
+
+Installing dependencies:
+  linux-sysctl-defaults
+
+Summary:
+  Upgrading: 0, Installing: 2, Removing: 0, Not Upgrading: 0
+  Download size: 56.9 kB
+  Space needed: 211 kB / 24.3 GB available
+
+Get:1 http://deb.debian.org/debian trixie/main amd64 iputils-ping amd64 3:20240905-3 [51.2 kB]
+Get:2 http://deb.debian.org/debian trixie/main amd64 linux-sysctl-defaults all 4.12 [5624 B]
+Fetched 56.9 kB in 0s (4543 kB/s)               
+debconf: unable to initialize frontend: Dialog
+debconf: (No usable dialog-like program is installed, so the dialog based frontend cannot be used. at /usr/share/perl5/Debconf/FrontEnd/Dialog.pm line 79, <STDIN> line 2.)
+debconf: falling back to frontend: Readline
+debconf: unable to initialize frontend: Readline
+debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 2.)
+debconf: falling back to frontend: Teletype
+Selecting previously unselected package iputils-ping.
+(Reading database ... 6706 files and directories currently installed.)
+Preparing to unpack .../iputils-ping_3%3a20240905-3_amd64.deb ...
+Unpacking iputils-ping (3:20240905-3) ...
+Selecting previously unselected package linux-sysctl-defaults.
+Preparing to unpack .../linux-sysctl-defaults_4.12_all.deb ...
+Unpacking linux-sysctl-defaults (4.12) ...
+Setting up linux-sysctl-defaults (4.12) ...
+Setting up iputils-ping (3:20240905-3) ...
+root@7644c2cdd9c3:/# ping 172.19.0.2   -----------------------------> here give the ping command and IP address of app-count container network IP
+^C
+--- 172.19.0.2 ping statistics ---
+12 packets transmitted, 12 received, 0% packet loss, time 11452ms
+rtt min/avg/max/mdev = 0.027/0.043/0.051/0.005 ms
+root@7644c2cdd9c3:/# 
+
+Here also not pinging 
 
 ping IP address of db-cont/IP address of app-cont
 
@@ -122,36 +249,82 @@ now we will do attach app-cont network to db-cont network
 
 we are attaching network to a container like below
 
-docker network connect db-network app-cont
+[root@DOCKER-NETWORK ~]# docker network connect db-network app-cont   ------------------------> command to connecting the app-cont to a db-network
+[root@DOCKER-NETWORK ~]# docker inspect app-cont -----------------------> command to inspect app-cont
 
 now check by inspecting 
 
-docker inspect app-cont/db-cont
+docker inspect app-cont
+
+Now app-cont has 
+
+1. app-network
+2. db-network
+
 
 now same attach db-cont network to app-cont network as well like above process
 
-docker network connect app-network db-cont
+[root@DOCKER-NETWORK ~]# docker network connect app-network db-container   ------------------------> command to connecting the db-container to a app-network
+[root@DOCKER-NETWORK ~]# docker inspect db-container  ------------------------> command to inspect the db-container
 
-docker inspect db-cont/app-cont
+now check by inspecting 
+
+docker inspect app-cont
+
+Now app-cont has 
+
+1. db-network
+2. app-network
 
 go to inside of one container like app-cont or db-cont
+============================================================
 
-docker exec -it app-cont bash
+[root@DOCKER-NETWORK ~]# docker exec -it app-cont bash
+root@fa681bef06f4:/# ping 172.19.0.2
+PING 172.19.0.2 (172.19.0.2) 56(84) bytes of data.
+64 bytes from 172.19.0.2: icmp_seq=1 ttl=127 time=0.084 ms
+64 bytes from 172.19.0.2: icmp_seq=2 ttl=127 time=0.071 ms
+64 bytes from 172.19.0.2: icmp_seq=3 ttl=127 time=0.070 ms
+64 bytes from 172.19.0.2: icmp_seq=4 ttl=127 time=0.071 ms
+64 bytes from 172.19.0.2: icmp_seq=5 ttl=127 time=0.070 ms
+64 bytes from 172.19.0.2: icmp_seq=6 ttl=127 time=0.066 ms
+64 bytes from 172.19.0.2: icmp_seq=7 ttl=127 time=0.072 ms
+64 bytes from 172.19.0.2: icmp_seq=8 ttl=127 time=0.070 ms
+^C
+--- 172.19.0.2 ping statistics ---
+15 packets transmitted, 15 received, 0% packet loss, time 14588ms
+rtt min/avg/max/mdev = 0.066/0.071/0.084/0.004 ms
+root@fa681bef06f4:/# 
+
+Now it is pinging
 
 ping IP address of db-cont
 
-it is pinging
+
+[root@DOCKER-NETWORK ~]# docker exec -it db-container bash -------------------------> command to enter into a container with name db-container
+root@7644c2cdd9c3:/# ping 172.18.0.2 -------------------------> command ping and IP address of ap-cont container
+PING 172.18.0.2 (172.18.0.2) 56(84) bytes of data.
+64 bytes from 172.18.0.2: icmp_seq=1 ttl=127 time=0.095 ms
+64 bytes from 172.18.0.2: icmp_seq=2 ttl=127 time=0.072 ms
+64 bytes from 172.18.0.2: icmp_seq=3 ttl=127 time=0.072 ms
+64 bytes from 172.18.0.2: icmp_seq=4 ttl=127 time=0.070 ms
+64 bytes from 172.18.0.2: icmp_seq=5 ttl=127 time=0.073 ms
+64 bytes from 172.18.0.2: icmp_seq=6 ttl=127 time=0.073 ms
+64 bytes from 172.18.0.2: icmp_seq=7 ttl=127 time=0.071 ms
+64 bytes from 172.18.0.2: icmp_seq=8 ttl=127 time=0.070 ms
+64 bytes from 172.18.0.2: icmp_seq=9 ttl=127 time=0.073 ms
+^C
+--- 172.18.0.2 ping statistics ---
+13 packets transmitted, 13 received, 0% packet loss, time 12512ms
+rtt min/avg/max/mdev = 0.069/0.073/0.095/0.006 ms
+root@7644c2cdd9c3:/# 
+
+Now It is pinging
 
 now do disconnect and check it is pinging or not
 
-docker network disconnect app-network db-cont
-
-docker network disconnect db-network app-cont
-
-docker network command
-
-
-
+[root@DOCKER-NETWORK ~]# docker network disconnect app-network db-container ----------------> command to disconnect the network with name app-network
+[root@DOCKER-NETWORK ~]# docker network disconnect db-network app-cont    ----------------> command to disconnect the network with name db-network
 
 
 DOCKER NETWORKS
