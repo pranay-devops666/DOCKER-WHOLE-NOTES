@@ -217,10 +217,12 @@ verify: Service converged
 
 docker service rollback client ----------------------------------> 
 
-
-
-
-
+for suppose if we have one version its called as version1 
+and next if we created a new version means it will be version2
+now if we rollbacked means the version version version3 will be get created and we go to the application in version2
+now again if we rollbacked means the version that means we want previous version means  version4 will be get created and we go to the application in version3
+if we are doing no.of times rollback means we will go to a previous version & newly created version only 
+Not like that we want particularly first version only the original version means we need to do upgrate the image
 
 
 docker swarm all commands
