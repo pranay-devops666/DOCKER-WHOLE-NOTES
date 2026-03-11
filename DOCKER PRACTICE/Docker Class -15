@@ -111,6 +111,8 @@ UNKNOWN:1, LOW:84, MEDIUM:17, HIGH:4, CRITICAL:0
 2. high:
 3. medium:
 
+CVE ---------------> COMMON Vulnerabilities EXPOSURE
+
 
 
 yum install git -y -------------------------------------------------------------> 
