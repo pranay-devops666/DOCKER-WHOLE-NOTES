@@ -3,8 +3,10 @@ Docker Class -12
 TOPIC: DOCKER SWARM
 =====================
 
-DOCKER SWARM
+DOCKER COMPOSE --------> used to create multiple services in a single host 
+
 DOCKER SWARM is completely oppsoite to DOCKER-COMPOSE
+=============                          =================
 
 
 DOCKER SWARM---------> it is used to create single service at a time on multiple hosts.
@@ -40,7 +42,7 @@ scaling means ---------> increasing or decreasing
 
 high availabilty also there in swarm
 
-a group of data centenrs is nothing but region and we can get high availabilty of these
+a group of data centers is nothing but region and we can get high availabilty of these
 
 launch 1 master server and 2 worker servers
 
@@ -53,7 +55,7 @@ launch all instances
 install docker on all servers/instances
 
 
-yum install docker -y && systemctl start docker
+yum install docker -y && systemctl start docker -------------------------------> 
 
 
 
@@ -68,7 +70,7 @@ after giivng this above command it will give toke like below
 
 docker swarm join --token SWMTKN-1-40k56utslhyg18yxugwuwoc3lmufpkbg98qphieiq2dob7kf0e-77zbcaxtomcuevj0g2ffxx3vr 172.31.26.20:2377
 
-giv ethis above command on worker1 and worker2 instances to join worker node
+give this above command on worker1 and worker2 instances to join worker node
 
 This node joined a swarm as a worker.
 
