@@ -105,6 +105,14 @@ Legend:
 
 To suppress version checks, run Trivy scans with the --skip-version-check flag
 
+UNKNOWN:1, LOW:84, MEDIUM:17, HIGH:4, CRITICAL:0
+
+1. CRITICAL: root user permission
+2. high:
+3. medium:
+
+
+
 yum install git -y -------------------------------------------------------------> 
 
 git clone https://github.com/devops0014/nodejs-docker.git ----------------------->
