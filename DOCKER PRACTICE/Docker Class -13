@@ -3,7 +3,7 @@ Docker Class -13
 TOPIC: DOCKER STACK (Deploy compose.yml file, update compose.yml file through CLI and DOCKER PORTAINER)
 ========================================================================================================
 
-DOCKER STACK
+DOCKER STACK 
 
 DOCKER STACK -------------> It is used to create multiple services on multiple hosts
 
