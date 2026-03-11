@@ -1,7 +1,7 @@
 Docker Class -13
 
-TOPIC: DOCKER STACK
-=======================
+TOPIC: DOCKER STACK (Deploy compose.yml file, update compose.yml file through CLI and DOCKER PORTAINER)
+========================================================================================================
 
 DOCKER STACK
 
@@ -19,10 +19,10 @@ t3.mocro----->keypair----->sg----->launch instance
 
 launch all instances and install docker on every instances
 
-yum install docker -y && systemctl start docker
+yum install docker -y && systemctl start docker -----------------> 
 
-docker swarm init
-docker node ls
+docker swarm init ----------------->
+docker node ls ------------------> 
 
 after this install docker-compose in all servers
 
@@ -39,6 +39,7 @@ docker-compose --version
 systemctl status docker
 
 vim compose.yml
+
 ---
 services:
   devops:
@@ -58,16 +59,19 @@ services:
 :wq
 
 
-docker stack deploy babu --compose-file=compose.yml
+[root@MANAGERSTACK ~]# docker stack deploy babu --compose-file=compose.yml -------------------------> 
+Creating network babu_default
+Creating service babu_azure
+Creating service babu_devops
+[root@MANAGERSTACK ~]#  
 
-
-[root@manager ~]# docker service ls
+[root@manager ~]# docker service ls ----------------------> 
 ID             NAME          MODE         REPLICAS   IMAGE                    PORTS
 taq0601c2kt9   babu_azure    replicated   4/4        shaikmustafa/dm:latest   *:8082->80/tcp
 plpjqf8q88qv   babu_devops   replicated   6/6        shaikmustafa/dm:latest   *:8081->80/tcp
 
 
-[root@manager ~]# docker service ps babu_azure
+[root@manager ~]# docker service ps babu_azure ------------------------------> 
 ID             NAME           IMAGE                    NODE       DESIRED STATE   CURRENT STATE           ERROR     PORTS
 kqvh2ndpbd74   babu_azure.1   shaikmustafa/dm:latest   worker-1   Running         Running 5 minutes ago             
 nceqpl0k1zea   babu_azure.2   shaikmustafa/dm:latest   worker-1   Running         Running 5 minutes ago             
@@ -83,9 +87,9 @@ http://100.29.184.21:8081/
 http://100.29.184.21:8082/
 
 
-docker stack config -c compose.yml
+docker stack config -c compose.yml --------------------------> command to view the configurations of compose.yml file
 
-[root@manager ~]# docker stack config -c compose.yml
+[root@manager ~]# docker stack config -c compose.yml --------------------> command to view the configurations of compose.yml file
 version: "3.12"
 services:
   azure:
@@ -108,26 +112,26 @@ services:
       protocol: tcp
 [root@manager ~]# 
 
-docker stack ls
+docker stack ls ---------------------> 
 
-[root@manager ~]# docker stack ls
+[root@manager ~]# docker stack ls ---------------> command to view list of stacks 
 NAME      SERVICES
 babu      2
 
 
-[root@manager ~]# docker stack deploy babu -c compose.yml
+[root@manager ~]# docker stack deploy babu -c compose.yml -------------------------> command to update compose.yml file after done adding data in it
 Updating service babu_azure (id: taq0601c2kt9xdrjxx27ivm78)
 Updating service babu_devops (id: plpjqf8q88qvyrjattdmjg6sd)
 [root@manager ~]# 
 
-[root@manager ~]# docker stack services babu
+[root@manager ~]# docker stack services babu ---------------------------> command to view the full information of created service with name babu
 ID             NAME          MODE         REPLICAS   IMAGE                    PORTS
 taq0601c2kt9   babu_azure    replicated   4/4        shaikmustafa/dm:latest   *:8082->80/tcp
 plpjqf8q88qv   babu_devops   replicated   6/6        shaikmustafa/dm:latest   *:8081->80/tcp
 [root@manager ~]# 
 
 
-as of now all we done with command like cli only
+as of now all we done with command like CLI only
 
 but now using the docker stack we can able to install portainer ------> it is an 3rd party tool in real time it doesn't use anyone
 
