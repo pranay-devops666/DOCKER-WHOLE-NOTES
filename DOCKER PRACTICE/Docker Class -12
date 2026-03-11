@@ -225,6 +225,83 @@ if we are doing no.of times rollback means we will go to a previous version & ne
 Not like that we want particularly first version only the original version means we need to do upgrate the image
 
 
+For example if we need to remove worker nodes means need to give command like below
+
+[root@DOCKER-SWARM ~]# docker node ls
+ID                            HOSTNAME       STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+qutq02uaec2mlqwu55dxdoode *   DOCKER-SWARM   Ready     Active         Leader           25.0.14
+i6iiyqu5xd2ro68zm2qdwsf85     NODE-1         Ready     Active                          25.0.14
+5yldoar2sovjx9b1k57kehg2h     NODE-2         Ready     Active                          25.0.14
+[root@DOCKER-SWARM ~]# 
+[root@NODE-1 ~]# docker swarm leave --------------> give this command on Worker node
+Node left the swarm.
+[root@NODE-1 ~]# 
+[root@NODE-2 ~]# docker swarm leave
+Node left the swarm.
+[root@NODE-2 ~]#
+[root@DOCKER-SWARM ~]# docker node ls
+ID                            HOSTNAME       STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
+qutq02uaec2mlqwu55dxdoode *   DOCKER-SWARM   Ready     Active         Leader           25.0.14
+i6iiyqu5xd2ro68zm2qdwsf85     NODE-1         Ready     Active                          25.0.14
+5yldoar2sovjx9b1k57kehg2h     NODE-2         Ready     Active                          25.0.14
+
+wroker node-1 & worker node-2 got removed but still showing on manager node 
+
+to remove in manager node also give command as below on Manager Node
+
+[root@DOCKER-SWARM ~]# docker node rm NODE-1
+NODE-1
+[root@DOCKER-SWARM ~]# 
+[root@DOCKER-SWARM ~]# docker node rm NODE-2
+NODE-1
+[root@DOCKER-SWARM ~]# 
+
+WORKER NODES Got deleted then, what about the created servers
+that servers will get shift into a another servers like servers shift from Manager server to Worker servers
+
+[root@DOCKER-SWARM ~]# docker service ps client
+ID             NAME           IMAGE                      NODE                        DESIRED STATE   CURRENT STATE             ERROR     PORTS
+220mnidbuxpg   client.1       shaikmustafa/paytm:bank    DOCKER-SWARM                Running         Running 4 minutes ago               
+q6k0g8l9bujt    \_ client.1   shaikmustafa/paytm:bank    i6iiyqu5xd2ro68zm2qdwsf85   Shutdown        Orphaned 2 minutes ago              
+0n90kzyvrvg8    \_ client.1   shaikmustafa/paytm:movie   i6iiyqu5xd2ro68zm2qdwsf85   Shutdown        Shutdown 19 minutes ago             
+0sf009e85gm7    \_ client.1   shaikmustafa/paytm:bank    i6iiyqu5xd2ro68zm2qdwsf85   Shutdown        Shutdown 20 minutes ago             
+smtmfwa01sow   client.2       shaikmustafa/paytm:bank    DOCKER-SWARM                Running         Running 3 minutes ago               
+u6isjumm92p2    \_ client.2   shaikmustafa/paytm:bank    NODE-2                      Shutdown        Running 18 minutes ago              
+oilgtnui9b51    \_ client.2   shaikmustafa/paytm:movie   NODE-2                      Shutdown        Shutdown 18 minutes ago             
+oqruy9agomqm    \_ client.2   shaikmustafa/paytm:bank    NODE-2                      Shutdown        Shutdown 20 minutes ago             
+9kk14ijbk351   client.3       shaikmustafa/paytm:bank    DOCKER-SWARM                Running         Running 19 minutes ago              
+u1oteaz7nayw    \_ client.3   shaikmustafa/paytm:movie   DOCKER-SWARM                Shutdown        Shutdown 19 minutes ago             
+e1foofw66u2s    \_ client.3   shaikmustafa/paytm:bank    DOCKER-SWARM                Shutdown        Shutdown 20 minutes ago             
+[root@DOCKER-SWARM ~]# 
+
+Again we need to get worker nodes on Maager node means 
+again we need to give command as worker join token like below
+
+[root@DOCKER-SWARM ~]# docker swarm join-token worker
+To add a worker to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-3xsqmgaqh6k5r4rqj38pois8tj03zfotyfp3jdcyj30qe37pq3-d5jndqvtm720il72jh62ejfq4 172.31.95.118:2377
+
+[root@DOCKER-SWARM ~]# 
+[root@NODE-1 ~]# docker swarm join --token SWMTKN-1-3xsqmgaqh6k5r4rqj38pois8tj03zfotyfp3jdcyj30qe37pq3-d5jndqvtm720il72jh62ejfq4 172.31.95.118:2377-------->
+This node joined a swarm as a worker.
+[root@NODE-1 ~]# 
+[root@NODE-2 ~]# docker swarm join --token SWMTKN-1-3xsqmgaqh6k5r4rqj38pois8tj03zfotyfp3jdcyj30qe37pq3-d5jndqvtm720il72jh62ejfq4 172.31.95.118:2377------>
+This node joined a swarm as a worker.
+[root@NODE-2 ~]# 
+
+For suppose if we need to add manager node means do command like below
+
+[root@DOCKER-SWARM ~]# docker swarm join-token manager
+To add a manager to this swarm, run the following command:
+
+    docker swarm join --token SWMTKN-1-3xsqmgaqh6k5r4rqj38pois8tj03zfotyfp3jdcyj30qe37pq3-eeag9oun5hwruqaugczb9a83d 172.31.95.118:2377
+
+[root@DOCKER-SWARM ~]# 
+
+Now we can give this manager node toke in any server to join as a manager
+
+
 docker swarm all commands
 
 
