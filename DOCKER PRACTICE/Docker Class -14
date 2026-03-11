@@ -4,10 +4,20 @@ TOPIC: DOCKER ECR (ELASTIC CONTAINER REGISTRY) & ECS (ELASTIC CONTAINER SERVICE)
 ==================================================================================
 
 DOCKER ECR & ECS
-
+====================
 
 ECR = ELASTIC CONTAINER REGISTRY
 ECS = ELASTIC CONTAINER SERVICE
+
+FARGATE ----------> Means serverless
+
+In Dev-Env
+CODE ----------> CAQ-------> BUILD-------> UNIT TEST-----------> ARTIFACT----------> IMAGE----------->SCAN IMAGE(For this we will use Trivy Tool)--------> IMAGE
+PUSH TO DOCKERHUB (In Image doesn't have any errors means) --------->DOCKER COMPOSE---------> POST BUILD ACTIONS
+
+In Prod-Env
+CODE ----------> CAQ-------> BUILD-------> UNIT TEST-----------> ARTIFACT----------> IMAGE----------->SCAN IMAGE(For this we will use Trivy Tool)--------> IMAGE
+PUSH TO DOCKERHUB (In Image doesn't have any errors means) --------->DOCKER STACK---------> POST BUILD ACTIONS
 
 first launch an instance to create image
 
