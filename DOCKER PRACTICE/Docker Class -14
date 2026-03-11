@@ -13,15 +13,15 @@ first launch an instance to create image
 
 install docker in the instance
 
-yum install docker -y && systemctl start docker
+yum install docker -y && systemctl start docker --------------------------> command to install docker & start as well
 
-yum install git -y
+yum install git -y -------------------------------> command to install git
 
-git clone https://github.com/devops0014/tic-tac-toe-docker.git
+git clone https://github.com/devops0014/tic-tac-toe-docker.git -------------------------------> command to clone the code from github(central) to git(local)
 
-cd tic-tac-toe-docker/
+cd tic-tac-toe-docker/ --------------------> command to go to the folder tic-tac-toe-docker
 
-[root@ip-172-31-79-70 ~]# cd tic-tac-toe-docker/
+[root@ip-172-31-79-70 ~]# cd tic-tac-toe-docker/ --------------------> command to go to the folder tic-tac-toe-docker
 [root@ip-172-31-79-70 tic-tac-toe-docker]# ll
 total 24
 -rw-r--r--. 1 root root    40 Dec 23 02:38 Dockerfile
@@ -62,11 +62,11 @@ select roles -----> create new role-----> use case: select ec2-----> select admi
 now we need to attach this role to ec2 instance
 
 
-select first created instanec-----> select actions-----> select security------> select existing role-------> select here what we created the role ---> select and update IAM role------> done
+select first created instanec-----> select actions-----> select security------> select existing role-------> select here what we created the role ---> 
+select and update IAM role------> done
 
-search ecr----> select what we created myrepo-----> open it-----> select view push commands -------> copy first command -----> and paste here on ec2 instance like below
-
-
+search ecr----> select what we created myrepo-----> open it-----> select view push commands -------> copy first command -----> and paste here on ec2 
+instance like below
 
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 061039784179.dkr.ecr.us-east-1.amazonaws.com
 
@@ -127,8 +127,6 @@ The push refers to repository [061039784179.dkr.ecr.us-east-1.amazonaws.com/myre
 77a2b55fbe8b: Pushed 
 latest: digest: sha256:ac2c432685af37b4414651f6e144eb998089c01267af1f292e448933012c0ef1 size: 1987
 [root@ip-172-31-79-70 tic-tac-toe-docker]#
-
-
 
 
 now we got the image in ECR what we created repo over there
