@@ -113,6 +113,12 @@ UNKNOWN:1, LOW:84, MEDIUM:17, HIGH:4, CRITICAL:0
 
 CVE ---------------> COMMON Vulnerabilities EXPOSURE
 
+How do we reduce the image size is
+
+1. we need to take the alphine/slim images as a base image for our Dockerfile
+2. write a multi stage Dockerfile
+3. dockerignore file use
+
 
 
 yum install git -y -------------------------------------------------------------> 
