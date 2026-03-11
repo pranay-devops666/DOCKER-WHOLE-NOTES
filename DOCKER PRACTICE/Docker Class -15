@@ -1,7 +1,7 @@
 Docker Class -15
 
-TOPIC: DOCKER SECURITY CONCEPT
-=================================
+TOPIC: DOCKER SECURITY CONCEPT (SCANNING IMAGES THROUGH TRIVY TOOL)
+========================================================================
 
 DOCKER SECURITY CONCEPT
 
@@ -23,10 +23,12 @@ launch instance
 
 install docker 
 
-yum install docker -y && systemct start docker
+yum install docker -y && systemct start docker ---------------------------> 
 
 vim index.html
+
 <h1>welcome to docker security class </h1>
+
 :wq
 
 now we need to deploy this file 
@@ -34,12 +36,13 @@ now we need to deploy this file
 means need to write Dockerfile
 
 vim Dockerfile
+
 FROM nginx
 COPY index.html /usr/share/nginx/html/
 
 :wq
 
-docker build -t image1 .
+docker build -t image1 . -------------------------> 
 
 docker images
 
@@ -47,21 +50,25 @@ now we can use trivy to chekc created image is safe or not
 
 we need to install trivy image here
 
-curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin v0.67.2
+sudo yum install -y wget && wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh && sudo sh install.sh -b /usr/local/bin ---------->
 
-trivy --version
+-------------------> command to install trivy on EC2-Instance
 
-trivy image image1
+trivy --version --------------------------->  command to check version of trivy
+
+trivy image image1 -----------------> command to scan the image
 
 vim Dockerfile
+
 FROM nginx:stable-alpine
 COPY index.html /usr/share/nginx/html/
 
 :wq
 
-docker build -t image2 .
+docker build -t image2 . -----------------> command to build Dockerfile
 
 vim Dockerfile
+
 FROM httpd:2.4-alpine
 COPY index.html /usr/local/apache2/htdocs/
 
@@ -98,13 +105,13 @@ Legend:
 
 To suppress version checks, run Trivy scans with the --skip-version-check flag
 
-yum install git -y
+yum install git -y -------------------------------------------------------------> 
 
-git clone https://github.com/devops0014/nodejs-docker.git
+git clone https://github.com/devops0014/nodejs-docker.git ----------------------->
+ 
+cd nodejs-docker/ ----------------------------->
 
-cd nodejs-docker/
-
-[root@ip-172-31-68-37 nodejs-docker]# ll
+[root@ip-172-31-68-37 nodejs-docker]# ll -------------------->
 total 16
 -rw-r--r--. 1 root root 110 Dec 24 09:26 Dockerfile
 -rw-r--r--. 1 root root 263 Dec 24 09:26 index.js
@@ -113,4 +120,4 @@ total 16
 
 now we need to build the Dockerfile here
 
-docker build -t image2 .
+docker build -t image2 . ------------------------------------->
