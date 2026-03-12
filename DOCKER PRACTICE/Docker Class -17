@@ -177,6 +177,39 @@ save and build the job-----> build job success
 
 upto now Build got success.
 
+
+pipeline {
+    agent {
+        node {
+            label 'Docker'
+        }
+    }
+    tools {
+        maven 'mymaven'
+    }
+    stages {
+        stage ("Code") {
+            steps {
+                git "https://github.com/pranay-devops666/dockerwebapp.git"
+            }
+        }
+        stage ("CQA") {
+            steps {
+                withSonarQubeEnv("mysonar") {
+                    sh "mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MyProject"
+                }
+            }
+        }
+        stage ("Build") {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+    }
+}
+
+Build Job Got success
+
 Now need to add stage Artifact Nexus 
 
 Now Artifacts (nexusArtifactUploader)
@@ -346,18 +379,23 @@ pipeline {
                 }
             }
         }
+        stage ("Build") {
+            steps {
+                sh 'mvn clean package'
+                sh 'cp -r target Docker-app'
+            }
+        }
         stage ("Artifact") {
             steps {
-               nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'nexus', groupId: 'com.visualpathit', nexusUrl: '184.72.105.98:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2' 
+               nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'nexus', groupId: 'com.visualpathit', nexusUrl: '184.72.105.98:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
             }
         }
     }
 }
 
+Now we need to create an Image by adding Image stage on job pipeline
 
-
-
-before doing this job configuration do install trivy on MANAGER instance
+Do install trivy on MANAGER instance
 
 [root@MANAGER ~]# sudo yum install -y wget && wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh && sudo sh install.sh -b /usr/local/bin
 aquasecurity/trivy info checking GitHub for tag 'v0.67.2'
@@ -367,9 +405,13 @@ aquasecurity/trivy info installed /usr/local/bin/trivy
 Version: 0.67.2
 [root@MANAGER ~]# 
 
-go to job and add another stage like below
 
 and install docker pipeline plugin as well in jenkins dashboard
+
+before going to doing this job configuration for below job pipeline do install trivy on MANAGER instance
+
+
+go to job and add another stage like below
 
 
 pipeline {
@@ -398,6 +440,11 @@ pipeline {
             steps {
                 sh 'mvn clean package'
                 sh 'cp -r target Docker-app'
+            }
+        }
+        stage ("Artifact") {
+            steps {
+               nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'nexus', groupId: 'com.visualpathit', nexusUrl: '184.72.105.98:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
             }
         }
         stage ("Image") {
@@ -442,7 +489,7 @@ save the job and build now
 job build got FAILURE 
 to get rid of this failure gie this command on MANAGER instance before giving the command need to install dockercompose on MANAGER instance
 
-chmod 777 /var/run/docker.sock
+chmod 777 /var/run/docker.sock ---------------->give this command on Manager Node 
 
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 # Apply executable permissions
@@ -457,7 +504,7 @@ sudo pip3 install docker-compose
 #check version
 docker-compose --version
 
-chmod 777 /var/run/docker.sock
+chmod 777 /var/run/docker.sock ---------------->give this command on Manager Node
 
 
 as of now we are using docker swarm or docker stack we are going to use thats why we used docker cluster like MANAGER, and 2 workers
@@ -486,16 +533,18 @@ need to change compose.yml in github like below ad run the job
 version: "3"
 services:
  devopsdb:
-   image: shaikmustafa/mynewapp:dbimage
+   image: pranay419/mynewapp:dbimage
    ports:
      - "3306:3306"
 
  application:
-   image: shaikmustafa/mynewapp:appimage
+   image: pranay419/mynewapp:appimage
    ports:
      - "1234:8080"
    depends_on:
      - "devopsdb"
+
+save commits
 
 
 Change application port from 1234 to 1111
@@ -517,7 +566,7 @@ services:
 
 
 
-[root@manager ~]# docker stack ls
+[root@manager ~]# docker stack ls -------------------->
 NAME      SERVICES
 flm       2
 [root@manager ~]# docker service ls
@@ -599,7 +648,11 @@ pipeline {
             sh 'cp -r target Docker-app'
         }
     }
- // add nexus stage here
+    stage ("Artifact") {
+            steps {
+               nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'nexus', groupId: 'com.visualpathit', nexusUrl: '184.72.105.98:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
+            }
+    }   
     stage ("Image") {
         steps {
             sh 'docker build -t appimage Docker-app'
