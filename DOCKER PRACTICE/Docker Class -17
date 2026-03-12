@@ -177,6 +177,154 @@ save and build the job-----> build job success
 
 upto now Build got success.
 
+Now need to add stage Artifact Nexus 
+
+Now Artifacts (nexusArtifactUploader)
+
+Foe this Neus launch one seperate EC2-Instance
+
+Launch Instance--------> name:NEXUS--------> Instance type:c7i-flex-large--------> with key pair-----------> nexus security group---------> 28 ebs volume------>
+launch and connect EC2-Instance
+
+To Launch Nexus Dashboard kindly follow these below steps
+
+Artifact (Nexus)
+==============================
+Once the build is successful, we package the application and upload the artifact to Nexus, 
+a repository manager that acts as a centralized storage for build artifacts.
+
+STEPS TO SETUP AN NEXUS DASHBOARD
+====================================
+
+1. Instance type: 2 cpus & 4 GB RAM & 20 GB EBS
+2. Java install
+3. Nexus download(sonatype nexus)
+4. untar (unzip)
+5. change the owners of those files (nexus)
+6. Nexus user create
+7. login as user and nexus start
+
+yum install java-17-amazon-corretto -y--------------> command to install java-17th version
+
+now create on folder
+
+mkdir /app----> enter
+
+
+https://help.sonatype.com/en/install-nexus-repository.html
+
+https://help.sonatype.com/en/download.html
+
+wget https://download.sonatype.com/nexus/3/nexus-3.89.1-02-linux-x86_64.tar.gz----------> command to download nexus 
+
+[root@NEXUS ~]# tar -zxvf nexus-3.89.1-02-linux-x86_64.tar.gz--------> command to unzip the file
+
+total 454244
+-rw-r--r--. 1 root root 465144623 Feb 11 12:16 nexus-3.89.1-02-linux-x86_64.tar.gz
+[root@NEXUS app]#
+
+[root@NEXUS app]# ll
+total 454244
+drwxr-xr-x. 6 root root        94 Feb 26 06:33 nexus-3.89.1-02
+-rw-r--r--. 1 root root 465144623 Feb 11 12:16 nexus-3.89.1-02-linux-x86_64.tar.gz
+drwxr-xr-x. 3 root root        20 Feb 10 18:29 sonatype-work
+[root@NEXUS app]#
+
+cd nexus-3.89.1-02 -------> command to go to that folder
+
+[root@NEXUS nexus-3.89.1-02]# cd bin/
+[root@NEXUS bin]# ll
+total 275996
+-rwxr-xr-x. 1 root root      6735 Feb 10 17:53 nexus
+-rw-r--r--. 1 root root      1325 Feb 10 17:53 nexus.vmoptions
+-rw-r--r--. 1 root root 282604548 Feb 10 18:28 sonatype-nexus-repository-3.89.1-02.jar
+[root@NEXUS bin]# ./nexus start
+WARNING: ************************************************************
+WARNING: Detected execution as "root" user.  This is NOT recommended!
+WARNING: ************************************************************
+Starting nexus
+[root@NEXUS bin]#
+
+[root@NEXUS bin]# useradd nexus
+[root@NEXUS bin]# su - nexus
+[nexus@NEXUS ~]$
+[nexus@NEXUS app]$ ll
+total 454244
+drwxr-xr-x. 6 root root        94 Feb 26 06:33 nexus-3.89.1-02
+-rw-r--r--. 1 root root 465144623 Feb 11 12:16 nexus-3.89.1-02-linux-x86_64.tar.gz
+drwxr-xr-x. 3 root root        20 Feb 10 18:29 sonatype-work
+[nexus@NEXUS app]$ cd nexus-3.89.1-02/
+[nexus@NEXUS bin]$ ll
+total 275996
+-rwxr-xr-x. 1 root root      6735 Feb 10 17:53 nexus
+-rw-r--r--. 1 root root      1325 Feb 10 17:53 nexus.vmoptions
+-rw-r--r--. 1 root root 282604548 Feb 10 18:28 sonatype-nexus-repository-3.89.1-02.jar
+[nexus@NEXUS bin]$ ./nexus start
+Starting nexus
+./nexus: line 175: /app/sonatype-work/nexus3/nexus.pid: Permission denied
+[nexus@NEXUS bin]$
+
+Nexus has been started but got an error as ./nexus: line 175: /app/sonatype-work/nexus3/nexus.pid: Permission denied
+
+permission denied on line no.175
+
+solution is change the owners for it run as neus user
+
+[root@NEXUS bin]# ll
+total 275996
+-rwxr-xr-x. 1 root root      6735 Feb 10 17:53 nexus
+-rw-r--r--. 1 root root      1325 Feb 10 17:53 nexus.vmoptions
+-rw-r--r--. 1 root root 282604548 Feb 10 18:28 sonatype-nexus-repository-3.89.1-02.jar
+[root@NEXUS bin]# chown nexus:nexus nexus
+[root@NEXUS bin]# 
+[root@NEXUS bin]# su - nexus
+Last login: Thu Feb 26 06:36:45 UTC 2026 on pts/1
+[nexus@NEXUS ~]$
+[nexus@NEXUS ~]$ cd /app/nexus-3.89.1-02/bin/
+[nexus@NEXUS ~]$ cd /app/
+[nexus@NEXUS app]$ ll
+total 454244
+drwxr-xr-x. 6 nexus nexus        94 Feb 26 06:33 nexus-3.89.1-02
+-rw-r--r--. 1 root  root  465144623 Feb 11 12:16 nexus-3.89.1-02-linux-x86_64.tar.gz
+drwxr-xr-x. 3 nexus nexus        20 Feb 10 18:29 sonatype-work
+[nexus@NEXUS app]$ cd nexus-3.89.1-02/bin/
+[nexus@NEXUS bin]$ ll
+total 275996
+-rwxr-xr-x. 1 nexus nexus      6735 Feb 10 17:53 nexus
+-rw-r--r--. 1 nexus nexus      1325 Feb 10 17:53 nexus.vmoptions
+-rw-r--r--. 1 nexus nexus 282604548 Feb 10 18:28 sonatype-nexus-repository-3.89.1-02.jar
+[nexus@NEXUS bin]$ ./nexus start
+Starting nexus
+[nexus@NEXUS bin]$
+
+http://184.72.105.98:8081/#login
+
+Sonatype Nexus Repository Dashboard has been Launched
+
+why we are using the NEXUS is to store the Artifacts by creating a repository and we stored in it
+
+Go to Sonatype Nexus Repository Dashboard------> select settings --------> select repository-----> create new repo------> select maven2(hosted) option----->
+name:repo name------>in deployment policy: allow redploy(means we can store our war file multiple times)------> create repository
+
+repo has been created
+
+now developers will update this created information in pom.xml like information related to created repo of name, url like below
+
+go to github code --------->open pom.xml file------> open it in here we need to update Artifact_URL in line number 36 & save commit
+
+now we need to store the war file in Sonatype Nexus Repository Dashboard of created repo
+
+to do like that we need to integrate to jenkins with the help of jenkins plugin
+
+Go to Jenkins Dashboard--------> go to manage jenkins---------> selct plugins, available plugins-------> search as nexusartifact uploder plugin-------> install it
+do configure created job---------> select build steps-----> nexus artifact uploder---------> fill all details here nexus version as official document, protocal:HTTP
+------>url:copy and paste here nexus dashbord url like only public IP & port number 8081----------> add nexus credentials-------> GroupId:it will be in pom.xml at
+line number:4--------> version it will be in pom.xml at line no:7--------> give repo name:My-Repo------> add Artifacts:ArtifactId:it will be in pom.xml at line no:5
+as myweb----------> type:war-------> File path: target/myweb-8.7.1.war(it will be seen in target folder) ---------> save & build now
+
+Build was successful
+
+
 before doing this job configuration do install trivy on MANAGER instance
 
 [root@MANAGER ~]# sudo yum install -y wget && wget https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh && sudo sh install.sh -b /usr/local/bin
