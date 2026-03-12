@@ -324,6 +324,38 @@ as myweb----------> type:war-------> File path: target/myweb-8.7.1.war(it will b
 
 Build was successful
 
+pipeline {
+    agent {
+        node {
+            label 'Docker'
+        }
+    }
+    tools {
+        maven 'mymaven'
+    }
+    stages {
+        stage ("Code") {
+            steps {
+                git "https://github.com/pranay-devops666/dockerwebapp.git"
+            }
+        }
+        stage ("CQA") {
+            steps {
+                withSonarQubeEnv("mysonar") {
+                    sh "mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MyProject"
+                }
+            }
+        }
+        stage ("Artifact") {
+            steps {
+               nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'nexus', groupId: 'com.visualpathit', nexusUrl: '184.72.105.98:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2' 
+            }
+        }
+    }
+}
+
+
+
 
 before doing this job configuration do install trivy on MANAGER instance
 
