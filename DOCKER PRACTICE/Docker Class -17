@@ -382,16 +382,16 @@ pipeline {
         stage ("Build") {
             steps {
                 sh 'mvn clean package'
-                sh 'cp -r target Docker-app'
             }
         }
         stage ("Artifact") {
             steps {
-               nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'nexus', groupId: 'com.visualpathit', nexusUrl: '184.72.105.98:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
+                nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'NexusID', groupId: 'com.visualpathit', nexusUrl: '3.83.96.105:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
             }
         }
     }
 }
+
 
 Now we need to create an Image by adding Image stage on job pipeline
 
@@ -450,7 +450,7 @@ pipeline {
         }
         stage ("Artifact") {
             steps {
-               nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'nexus', groupId: 'com.visualpathit', nexusUrl: '184.72.105.98:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
+               nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'NexusID', groupId: 'com.visualpathit', nexusUrl: '3.83.96.105:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
             }
         }
         stage ("Image") {
