@@ -410,6 +410,12 @@ and install docker pipeline plugin as well in jenkins dashboard
 
 before going to doing this job configuration for below job pipeline do install trivy on MANAGER instance
 
+after adding the stage of stage(Image) for going to build Dockerfile to build Image 
+
+we need to install plugin Docker pipeline in jenkins Dashboard
+
+we need to install a plugin called Docker pipeline to save the credentials of our DockerHub
+
 
 go to job and add another stage like below
 
