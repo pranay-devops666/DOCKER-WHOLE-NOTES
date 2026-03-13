@@ -729,6 +729,8 @@ services:
    depends_on:
      - "devopsdb"
 
+for the above compose-file meaning is from the deponds on service name devopsdb the container will be get created for the application with port number 1234
+
 
 save commit changes
 
@@ -800,3 +802,77 @@ pipeline {
         }
     }
 }
+
+
+
+[root@MANAGER-NODE ~]# docker stack ls
+NAME      SERVICES
+hanuman   2
+[root@MANAGER-NODE ~]# docker service ls
+ID             NAME                  MODE         REPLICAS   IMAGE                        PORTS
+yxomd2cq4eec   hanuman_application   replicated   1/1        pranay419/jairepo:appimage   *:1234->8080/tcp
+nfs0jla1zzsk   hanuman_devopsdb      replicated   1/1        pranay419/ramrepo:dbimage    *:3306->3306/tcp
+[root@MANAGER-NODE ~]# 
+
+
+now try to access the application 
+
+By copying the Worker node-1 Public IP and port number 1234
+
+http://3.87.255.7:1234/login
+
+
+Now we need high availabilty for this application
+
+High availabilty means -------> replicas
+
+we will do now manually (In Docker we will do manually)
+
+in kubernetes there will be a high availability option
+
+[root@MANAGER-NODE ~]# docker service scale hanuman_application=3
+hanuman_application scaled to 3
+overall progress: 3 out of 3 tasks 
+1/3: running   [==================================================>] 
+2/3: running   [==================================================>] 
+3/3: running   [==================================================>] 
+verify: Service converged 
+[root@MANAGER-NODE ~]# docker service scale hanuman_devopsdb=3
+hanuman_devopsdb scaled to 3
+overall progress: 3 out of 3 tasks 
+1/3: running   [==================================================>] 
+2/3: running   [==================================================>] 
+3/3: running   [==================================================>] 
+verify: Service converged 
+[root@MANAGER-NODE ~]# 
+
+
+Now for the application and database has 3 containers seperately
+
+which where the containers are available on every servers
+
+[root@MANAGER-NODE ~]# docker service ls
+ID             NAME                  MODE         REPLICAS   IMAGE                        PORTS
+yxomd2cq4eec   hanuman_application   replicated   3/3        pranay419/jairepo:appimage   *:1234->8080/tcp
+nfs0jla1zzsk   hanuman_devopsdb      replicated   3/3        pranay419/ramrepo:dbimage    *:3306->3306/tcp
+[root@MANAGER-NODE ~]# docker service ps hanuman_application
+ID             NAME                    IMAGE                        NODE            DESIRED STATE   CURRENT STATE                ERROR     PORTS
+9ffgj6n926iy   hanuman_application.1   pranay419/jairepo:appimage   WORKERNODE-1    Running         Running 9 minutes ago                  
+zkyuh7d1duqe   hanuman_application.2   pranay419/jairepo:appimage   WORKER-NODE-2   Running         Running about a minute ago             
+u2qdr6mdznji   hanuman_application.3   pranay419/jairepo:appimage   MANAGER-NODE    Running         Running about a minute ago             
+[root@MANAGER-NODE ~]# docker service ps hanuman_devopsdb
+ID             NAME                 IMAGE                       NODE            DESIRED STATE   CURRENT STATE                ERROR     PORTS
+r7pattd419cv   hanuman_devopsdb.1   pranay419/ramrepo:dbimage   MANAGER-NODE    Running         Running 9 minutes ago                  
+qjq6fen92o9k   hanuman_devopsdb.2   pranay419/ramrepo:dbimage   WORKER-NODE-2   Running         Running about a minute ago             
+cdgzu8txgfqh   hanuman_devopsdb.3   pranay419/ramrepo:dbimage   WORKERNODE-1    Running         Running about a minute ago             
+[root@MANAGER-NODE ~]# 
+
+
+IN Real time we will expose only worker node-1 and worker node-2
+we wont do on Manager node why because manager will be responsible for maintaining the cluster not to run the application
+
+customers will be accessible from Worker nodes only 
+
+request will go only worker nodes 
+
+request will need to go manager nodes also we will use load balancers
