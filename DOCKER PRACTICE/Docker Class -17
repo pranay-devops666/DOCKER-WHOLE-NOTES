@@ -678,7 +678,61 @@ ah2w8v4oisn5   flm_devopsdb.3   shaikmustafa/mynewapp:dbimage   worker-2   Runni
 [root@manager ~]# 
 
 
+AND LAST HERE GOING TO DEPLOY WE ARE TRYING TO USE DOCKER-SWARM OR DOCK-COMPOSE
+==================================================================================
 
+For this purpose we used to create a cluster like MANAGER Node, workers nodes
+
+For docker-stack we need compose and swarm as well
+
+we already have the swarm like cluster manager and worker nodes
+
+we need to install compose on MANAGER NODE like below
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+# Apply executable permissions
+sudo chmod +x /usr/local/bin/docker-compose
+# Create a symbolic link
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+
+# Install using pip (Python package manager)
+sudo yum install -y python3-pip
+sudo pip3 install docker-compose
+
+#check version
+docker-compose --version
+
+
+
+[root@MANAGER-NODE ~]# docker-compose --version
+docker-compose version 1.29.2, build 5becea4c
+[root@MANAGER-NODE ~]#
+
+Now we nee dto write compose file in github code
+
+
+
+compose.yml
+
+---
+version: "3"
+services:
+ devopsdb:
+   image: pranay419/ramrepo:dbimage
+   ports:
+     - "3306:3306"
+
+ application:
+   image: pranay419/jairepo:appimage
+   ports:
+     - "1234:8080"
+   depends_on:
+     - "devopsdb"
+
+
+save commit changes
+
+NOTE: IN stack container names doesn't support
 
 
 FINAL DOCKER PROJECT ON STACK JOB-PIPELINE
@@ -741,7 +795,7 @@ pipeline {
         }
         stage ("Deploy") {
             steps {
-                sh 'docker stack deploy flm --compose-file=compose.yml'
+                sh 'docker stack deploy hanuman --compose-file=compose.yml'
             }
         }
     }
