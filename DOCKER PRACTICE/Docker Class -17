@@ -451,7 +451,7 @@ pipeline {
         }
         stage ("Artifact") {
             steps {
-                nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'NexusID', groupId: 'com.visualpathit', nexusUrl: '3.83.96.105:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
+                nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'NexusID', groupId: 'com.visualpathit', nexusUrl: '3.83.96.105:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
             }
         }
         stage ("Image") {
@@ -479,23 +479,22 @@ pipeline {
     }
 }
 
-
 upto now save and build the Job 
 
 
 pipeline {
     agent {
         node {
-            label 'docker'
+            label 'Docker'
         }
     }
     tools {
         maven 'mymaven'
     }
     stages {
-        stage('Code') {
+        stage ("Code") {
             steps {
-                git "https://github.com/devops0014/dockerwebapp.git"
+                git "https://github.com/pranay-devops666/dockerwebapp.git"
             }
         }
         stage ("CQA") {
@@ -513,7 +512,7 @@ pipeline {
         }
         stage ("Artifact") {
             steps {
-               nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'NexusID', groupId: 'com.visualpathit', nexusUrl: '3.83.96.105:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
+                nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'NexusID', groupId: 'com.visualpathit', nexusUrl: '3.83.96.105:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
             }
         }
         stage ("Image") {
@@ -522,25 +521,19 @@ pipeline {
                 sh 'docker build -t dbimage Docker-db'
             }
         }
-        stage ("ScanImage") {
-            steps {
-                sh 'trivy image appimage'
-                sh 'trivy image dbimage'
-            }
-        }
         stage ("Tag") {
             steps {
-                sh 'docker tag appimage pranay419/mynewapp:appimage'
-                sh 'docker tag dbimage pranay419/mynewapp:dbimage'
+                sh 'docker tag appimage pranay419/jairepo:appimage'
+                sh 'docker tag dbimage pranay419/ramrepo:dbimage'
             }
         }
         stage ("Push") {
             steps {
                 script {
-                    withDockerRegistry(credentialsId: 'docker-nodess') {
-                        sh 'docker push pranay419/mynewapp:appimage'
-                        sh 'docker push pranay419/mynewapp:dbimage'
-                    }
+                    withDockerRegistry(credentialsId: 'Dockerhub') {
+                        sh 'docker push pranay419/jairepo:appimage'
+                        sh 'docker push pranay419/ramrepo:dbimage'
+                    }    
                 }
             }
         }
@@ -550,8 +543,7 @@ pipeline {
             }
         }
     }
-}
-
+}        
 
 save the job and build now
 
@@ -686,74 +678,71 @@ ah2w8v4oisn5   flm_devopsdb.3   shaikmustafa/mynewapp:dbimage   worker-2   Runni
 [root@manager ~]# 
 
 
-DOCKER PROJECT ON STACK JOB-PIPELINE
+
+
+
+FINAL DOCKER PROJECT ON STACK JOB-PIPELINE
 ==========================================
 
 pipeline {
     agent {
         node {
-            label 'docker'
+            label 'Docker'
         }
     }
     tools {
         maven 'mymaven'
     }
     stages {
-        stage('Code') {
+        stage ("Code") {
             steps {
-                git "https://github.com/devops0014/dockerwebapp.git"
+                git "https://github.com/pranay-devops666/dockerwebapp.git"
             }
         }
-    stage ("CQA") {
-        steps {
-            withSonarQubeEnv("mysonar") {
-                sh "mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MyProject"
-            }
-        }
-    }
-    stage ("Build") {
-        steps {
-            sh 'mvn clean package'
-            sh 'cp -r target Docker-app'
-        }
-    }
-    stage ("Artifact") {
+        stage ("CQA") {
             steps {
-               nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'nexus', groupId: 'com.visualpathit', nexusUrl: '184.72.105.98:8081/', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
-            }
-    }   
-    stage ("Image") {
-        steps {
-            sh 'docker build -t appimage Docker-app'
-            sh 'docker build -t dbimage Docker-db'
-        }
-    }
-    stage ("ScanImage") {
-        steps {
-            sh 'trivy image appimage'
-            sh 'trivy image dbimage'
-        }
-    }
-    stage ("Tag") {
-        steps {
-            sh 'docker tag appimage shaikmustafa/mynewapp:appimage'
-            sh 'docker tag dbimage shaikmustafa/mynewapp:dbimage'
-        }
-    }
-    stage ("Push") {
-        steps {
-            script {
-                withDockerRegistry(credentialsId: 'dockerhub') {
-                    sh 'docker push shaikmustafa/mynewapp:appimage'
-                    sh 'docker push shaikmustafa/mynewapp:dbimage'
+                withSonarQubeEnv("mysonar") {
+                    sh "mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MyProject"
                 }
             }
         }
-    }
-    stage ("Deploy") {
-        steps {
-            sh 'docker stack deploy flm --compose-file=compose.yml'
+        stage ("Build") {
+            steps {
+                sh 'mvn clean package'
+                sh 'cp -r target Docker-app'
+            }
+        }
+        stage ("Artifact") {
+            steps {
+                nexusArtifactUploader artifacts: [[artifactId: 'spring-web', classifier: '', file: 'target/vprofile-v2.war', type: 'war']], credentialsId: 'NexusID', groupId: 'com.visualpathit', nexusUrl: '3.83.96.105:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'MyRepo', version: 'v2'
+            }
+        }
+        stage ("Image") {
+            steps {
+                sh 'docker build -t appimage Docker-app'
+                sh 'docker build -t dbimage Docker-db'
+            }
+        }
+        stage ("Tag") {
+            steps {
+                sh 'docker tag appimage pranay419/jairepo:appimage'
+                sh 'docker tag dbimage pranay419/ramrepo:dbimage'
+            }
+        }
+        stage ("Push") {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'Dockerhub') {
+                        sh 'docker push pranay419/jairepo:appimage'
+                        sh 'docker push pranay419/ramrepo:dbimage'
+                    }    
+                }
+            }
+        }
+        stage ("Deploy") {
+            steps {
+                sh 'docker stack deploy flm --compose-file=compose.yml'
+            }
         }
     }
-  }
 }
