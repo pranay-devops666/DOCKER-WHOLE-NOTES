@@ -1,0 +1,299 @@
+https://docker77.hashnode.dev/docker-introduction-architecture
+https://docker77.hashnode.dev/mastering-the-art-of-creating-containers
+Todays Commands:
+
+
+
+
+yum install docker -y
+
+    2  docker version
+
+    3  systemctl status docker
+
+    4  systemctl start docker
+
+    5  systemctl status docker
+
+    6  docker version
+
+    7  docker pull shaikmustafa/paytm:bus
+
+    8  docker images
+
+    9  docker run -d --name bus -p 1431:80  shaikmustafa/paytm:bus
+
+   10  docker ps
+
+   11  docker logs bus
+
+   12  docker ps
+
+   13  docker pull shaikmustafa/paytm:movie
+
+   14  docker images
+
+   15  docker run -d --name movie -p 1111:80  shaikmustafa/paytm:movie
+
+   16  docker ps
+
+   17  docker pull shaikmustafa/paytm:bank
+
+   18  docker images
+
+   19  docker run -d --name bank -p 2222:80 shaikmustafa/paytm:movie
+
+   20  docker ps
+
+   21  docker rm bank
+
+   22  docker stop bank
+
+   23  docker rm bank
+
+   24  docker ps
+
+   25  docker run -d --name bank -p 2222:80 shaikmustafa/paytm:bank
+
+   26  docker ps
+
+   27  docker stop movie
+
+   28  docker start movie
+
+   29  docker stop bank
+
+   30  docker start banl
+
+   31  docker start bank
+
+   32  docker images
+
+   33  history
+
+
+
+
+What is Docker
+What is Containerization
+Diff between vm and container
+what is docker image
+what is container
+diff b/w container and image
+what is command to create a container
+what is command to pull the images
+how to see running containers
+how to check container logs
+
+1. explain about docker architecture
+2. refer all docker commands
+
+
+What is Dockerfile
+2. what is the diff b/w copy and add
+3. diff b/w env and arg
+4. what is the command to build a Dockerfile
+
+
+
+Dockerfile COMPONENTS
+
+ 
+
+It is used to create Images
+It contains set of instructions
+It contains some components
+ 
+
+FROM : used to declare the base imagesex: FROM python
+ex: FROM node
+ex: FROM ubuntu
+LABEL : used to add the description about image
+MAINTAINER : used to define the author details
+COPY : used to copy the files from local to container.
+ADD : used to copy the files from local to container and it will download the files from internet and send those files to container.
+ARG : used to pass the variables while we build the image - these vars will not be available inside the container, 
+we can overwrite these values while we build the image
+ENV : used top pass the variables - these vars will be available inside the container, we can’t overwrite these values while we build the image
+WORKDIR : used to set a default path for our container
+RUN : used to execute the commands
+EXPOSE : used to expose the port number
+
+
+https://docker77.hashnode.dev/mastering-dockerfiles-your-ultimate-guide-to-container-image-creation
+
+DOCKER CLASS -04
+
+Deepseek code link : 
+
+
+e-commerce app : https://chat.deepseek.com/share/7avbonbpq9vno81bvj
+Python-app : https://chat.deepseek.com/share/qpyne33hte7plm5729
+
+
+CMD vs ENTRYPOINT
+Write a Dockerfile for Python application
+
+
+https://docker77.hashnode.dev/dockerfiles-for-web-applications
+
+
+https://docker77.hashnode.dev/dockerfiles-for-web-applications
+
+
+What is docker registry
+How to push docker images to registry
+
+
+https://docker77.hashnode.dev/docker-volumes-with-real-time-examples
+
+https://docker77.hashnode.dev/a-devops-engineers-journey-into-docker-networks
+
+Todays commands:
+
+
+1  yum install docker -y && systemctl start docker
+
+    2  docker network ls
+
+    3  docker run -itd --name cont1 -p 1111:80 nginx
+
+    4  docker inspect cont1
+
+    5  docker network ls
+
+    6  docker run -itd --name cont2 -p 2222:80 --network=host  nginx
+
+    7  docker run -itd --name cont3 -p 3333:80 --network=host  nginx
+
+    8  docker run -itd --name cont4 -p 4444:80 --network=host httpd
+
+    9  docker ps
+
+   10  docker ps -a
+
+   11  docker netowkr ls
+
+   12  docker network ls
+
+   13  docker network create app-network
+
+   14  docker network ls
+
+   15  docker network create db-network
+
+   16  docker run -itd --name app-cont -p 1122:80 --network app-network nginx
+
+   17  docker ps
+
+   18  docker inspect app-cont
+
+   19  docker run -itd --name db-cont -p 2233:80 --network db-network nginx
+
+   20  docker inspect db-cont
+
+   21  docker inspect app-cont
+
+   22  docker inspect db-cont
+
+   23  docker exec -it app-cont bash
+
+   24  docker exec -it db-cont bash
+
+   25  docker ps
+
+   26  docker network attach db-network app-cont
+
+   27  docker network connect db-network app-cont
+
+   28  docker inspect app-cont
+
+   29  docker network connect app-network db-cont
+
+   30  docker exec -it db-cont bash
+
+   31  docker exec -it app-cont bash
+
+   32  docker network disconnect app-network db-cont
+
+   33  docker network disconnect db-network app-cont
+
+   34  docker exec -it app-cont bash
+
+   35  docker netowkr
+
+   36  docker network
+
+   37  docker network rm app-network
+
+   38  docker network create flm
+
+   39  docker network rm flm
+
+   40  docker network
+
+   41  history
+
+
+Compose install commands:
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+sudo yum install -y python3-pip
+sudo pip3 install docker-compose
+docker-compose --version
+
+
+
+
+
+
+Todays commands:
+docker-compose up -d
+docker-compose down
+docker-compose stop
+docker-compose start
+docker-compose build
+docker-compose ps
+docker-compose logs
+docker-compose pause
+docker-compose unpause
+docker-compose config
+
+
+
+
+Todays Interview Questions:
+1. what is compose and how it works
+2. write a compose file
+
+
+https://docker77.hashnode.dev/scaling-in-docker-compose-with-hands-on-examples
+
+https://docker77.hashnode.dev/mastering-docker-swarm-a-devops-engineers-experience
+
+Todays Interview questions:
+1. what is swarm and how it works
+2. diff b/w compose and swarm
+
+https://docker77.hashnode.dev/docker-stack-simplifying-multi-container-applications-on-cluster
+
+https://docker77.hashnode.dev/trivy-with-docker-secure-your-container-images
+
+how do u reduce the docker image size
+2. write a Dockerfile (preferred multi-stage dockerfile for nodejs)
+3. what is trivy.
+4. tell me some issues that you found while scanning with trivy image. 
+
+Todays notes :
+
+
+1. mkfs -t xfs /dev/nvme1n1
+2.  mount /dev/nvme1n1 /var/lib/docker
+3. systemctl restart docker
+4. pull some images
+5. check with "df -h"
+
+
+
+
