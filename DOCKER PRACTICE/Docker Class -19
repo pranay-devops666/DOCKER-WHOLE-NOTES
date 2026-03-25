@@ -65,7 +65,7 @@ then go to Jenkins Dashboard and setup agent
 go to jenkins dashboard ---------> select manage jenkins ----------> select nodes --------> new node --------> name: docker node ----------> no. of executors :2
 ------> remote root direcory: /home/ec2-user/jenkins/ -------> labels: prod --------> usage: only build jobs with matching this node -------> launch agents via ssh
 ------> host: private ip of master server -------> add credentials ------> kind: ssh username with private key -------> id: master ------> description: docker swarm
--------> username: ec2-username -----------> private key: enter directly: copy and paste keypair data here --------> host key verification: non-verify strategy ---->save
+-------> username: ec2-user-----------> private key: enter directly: copy and paste keypair data here --------> host key verification: non-verify strategy ---->save
 
 
 
