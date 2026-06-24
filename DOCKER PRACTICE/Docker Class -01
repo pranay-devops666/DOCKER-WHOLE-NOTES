@@ -44,6 +44,9 @@ Todays Commands:
                                                                 name, shaikmustafa/paytm:bus is the image name, 1431 is the host port/custom portnumber 
                                                                                                            :80 is the container port depends on application
                                                                                                      like timcat webserver application port no. is 80 like that)
+    1431:80
+    1431 ------------> this is host port (custom)
+    80   ------------> this is container port which depends on applicatio port
 
 
 http://3.93.75.138:1431/------------------> able to access the application with container port no:1413
