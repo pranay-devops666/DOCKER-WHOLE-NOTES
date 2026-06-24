@@ -4,6 +4,16 @@ Docker Class -01
 TOPIC: Docker installation & creating Images and containers
 =================================================================
 
+Containerization:  It is the process of packing application with dependencies called Containerization. For this we are using Docker Tool.
+If i do Containerization one Image will get generated called aa application Image whenever i can run this image the application can deploy anywhere.
+Whenever we run the Image application can get deploy. Instead of giving Code we are running Image to deploy an application, Inside this Image consists are Code +
+dependencies.
+
+
+Monolithic: It consists of Number of services & for each service to be maintained as seperate serve for each service like movie ticket, train ticket, etc. Example Paytm app.
+MicroService: It consists of Single server for application and single server for Database and for all services have to be maintained only single server.
+
+
 Blogs : 
 link-1: https://docker77.hashnode.dev/docker-introduction-architecture
 
