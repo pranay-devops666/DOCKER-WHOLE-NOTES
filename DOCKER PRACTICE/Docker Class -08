@@ -90,6 +90,9 @@ launch one instance--->t3.micro-->keypair----->jensecgrp------>ebs volume ---->2
 
 [root@DOCKER-VOLUMES ~]# docker volume ls ---------------------------> command to view list of volumes 
 DRIVER    VOLUME NAME
+
+docker volume rm $(docker volume ls -q) ----------------------------> command to delete created volumes
+
 [root@DOCKER-VOLUMES ~]# docker volume create devopsdb --------------------------> command to create a volume
 devopsdb
 [root@DOCKER-VOLUMES ~]# docker volume ls ---------------------------> command to view list of volumes 
