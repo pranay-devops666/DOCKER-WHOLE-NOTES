@@ -552,6 +552,83 @@ stage:6
 docker-compose up
 
 
+DOCKERFILE TO CREATE VOLUMES NETWORKS AND HOW TO CONNECT ONE NETWORK TO ANOTHER NETWORK
+==========================================================================================
+
+
+[root@ip-172-31-37-70 swiggy]# vim compose.yml 
+[root@ip-172-31-37-70 swiggy]# cat compose.yml 
+---
+version: "3"
+services:
+  dineout:
+    container_name: dineout-cont
+    build: ./dineout/
+    image: dineout-img
+    ports:
+      - "1111:80"
+    volumes:
+      - dineoutvolume:/usr/share/nginx/html/
+    networks:
+      - dineoutnetwork
+      - food-deliverynetwork
+
+  food-delivery:
+    container_name: food-delivery-cont
+    build: ./food-delivery/
+    image: food-delivery-img
+    ports:
+      - "2222:80"
+    volumes:
+      - food-deliveryvolume:/usr/share/nginx/html/
+    networks:
+      - food-deliverynetwork
+      - dineoutnetwork
+  
+  genie:
+    container_name: genie-cont
+    build: ./genie/
+    image: genie-img
+    ports:
+      - "3333:80"
+    volumes:
+      - genievolume:/usr/share/nginx/html/
+    networks:
+      - genienetwork
+      - instamartnetwork
+
+  instamart:
+    container_name: instamart-cont
+    build: ./instamart/
+    image: instamart-img
+    ports:
+      - "4444:80"
+    volumes:
+      - instamartvolume:/usr/share/nginx/html/
+    networks:
+      - instamartnetwork
+      - genienetwork
+
+volumes:
+  dineoutvolume:
+  food-deliveryvolume:
+  genievolume:
+  instamartvolume:
+
+networks:
+  dineoutnetwork:
+    driver: bridge
+  food-deliverynetwork:
+    driver: bridge
+  genienetwork:
+    driver: bridge
+  instamartnetwork:
+    driver: bridge
+
+
+
+:wq
+
 
 Compose install commands:
 sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
