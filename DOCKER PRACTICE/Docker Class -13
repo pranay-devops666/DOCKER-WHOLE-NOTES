@@ -137,6 +137,15 @@ but now using the docker stack we can able to install portainer ------> it is an
 
 it will work on gui
 
+
+go to all setups github url ----------------> select portainer setup 
+
+copy and pasete below command s to launch portainer dashboard
+
+curl -L https://downloads.portainer.io/ce2-16/portainer-agent-stack.yml -o portainer-agent-stack.yml ---------------------------------->
+docker stack deploy -c portainer-agent-stack.yml portainer ---------------------------------->
+docker ps ---------------------------------->
+
 [root@manager ~]# docker stack ps portainer
 ID             NAME                                        IMAGE                           NODE       DESIRED STATE   CURRENT STATE            ERROR     PORTS
 i1bslepfgui2   portainer_agent.h5elvxmrzptex0iajtlclw5f1   portainer/agent:2.16.2          worker-2   Running         Running 42 seconds ago             
