@@ -80,4 +80,25 @@ lets take ebs volume now
 
 seperate ebs volume now
 
-create volume--------->
+create volume---------> size: 15GB --------------> create same availabilty zone in ebs also -------------> select availabilty zone: which availability has been
+in -----------> add tag: Name-------> volume-optional:Docker-Volume ------------> create volume
+
+now do attach this created volume
+
+select instance ----------> select actions -----> attach volume ----------> select this instance -----------> device name:/dev/xvdf ----------> 
+-------> specify custom name:Device Name:/dev/xvdf --------------------> attach volume
+
+
+now how do we know how many ebs volumes we have is
+
+fdisk -l ------------------> command to know it 
+
+
+do mount now
+
+
+mkfs --------------> represents make file set
+
+mkfs -t xfs /dev/nvme1n1 ----------------------------->
+
+
