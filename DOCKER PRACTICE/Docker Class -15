@@ -4,6 +4,10 @@ TOPIC: DOCKER SECURITY CONCEPT (SCANNING IMAGES THROUGH TRIVY TOOL)
 ========================================================================
 
 DOCKER SECURITY CONCEPT
+=======================
+
+DOCKER SECURITY CONCEPT (SCANNING IMAGES THROUGH TRIVY TOOL & REDUCING THE IMAGE SIZE)
+=============================================================================================
 
 whole concept is 
 
@@ -134,6 +138,205 @@ total 16
 -rw-r--r--. 1 root root  82 Dec 24 09:26 package-lock.json
 -rw-r--r--. 1 root root 436 Dec 24 09:26 package.json
 
+
+vim Dockerfile
+
+FROM node:16
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 3000
+CMD ["node", "index.js"]
+
+
+:wq
+
+
+this above Dockerfile is present in above code github repo
+
 now we need to build the Dockerfile here
 
 docker build -t image2 . ------------------------------------->
+
+
+
+[root@DOCKER-TRIVY nodejs-docker]# docker images
+REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
+image3       latest    b6cbfee477d8   4 minutes ago   909MB
+image4       latest    b6cbfee477d8   4 minutes ago   909MB
+image2       latest    754eae4dd428   6 minutes ago   66.9MB
+image1       latest    754eae4dd428   6 minutes ago   66.9MB
+[root@DOCKER-TRIVY nodejs-docker]# 
+
+
+[root@DOCKER-TRIVY nodejs-docker]# docker images
+REPOSITORY   TAG       IMAGE ID       CREATED         SIZE
+image3       latest    b6cbfee477d8   4 minutes ago   909MB ---------------> now this image size has 909MB
+
+
+now we need to reduce this 909MB by using Trivy like below
+
+
+first we need to write the Dockerfile for multi-stage
+
+vim Dockerfile
+
+FROM node:19-alpine AS babu
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+FROM babu as final
+RUN npm install --production 
+COPY . .
+CMD ["node", "index.js"]
+
+:wq
+
+[root@DOCKER-TRIVY nodejs-docker]# docker images
+REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
+image5       latest    5ea89df2a37e   11 seconds ago   177MB ------------------------------------------> reduced image size from 909MB to 177MB
+image3       latest    b6cbfee477d8   11 minutes ago   909MB ------------------------------------------> from image size 909MB to above 177MB 
+image4       latest    b6cbfee477d8   11 minutes ago   909MB
+image2       latest    754eae4dd428   14 minutes ago   66.9MB
+image1       latest    754eae4dd428   14 minutes ago   66.9MB
+[root@DOCKER-TRIVY nodejs-docker]# 
+
+
+[root@DOCKER-TRIVY nodejs-docker]# cd
+[root@DOCKER-TRIVY ~]# ll
+total 20
+-rw-r--r--. 1 root root   65 Jun 30 01:36 Dockerfile
+-rw-r--r--. 1 root root   43 Jun 30 01:28 index.html
+-rw-r--r--. 1 root root 9945 Jun 30 01:31 install.sh
+drwxr-xr-x. 3 root root   97 Jun 30 01:56 nodejs-docker
+[root@DOCKER-TRIVY ~]# rm -rf *
+[root@DOCKER-TRIVY ~]# ll
+total 0
+
+[root@DOCKER-TRIVY ~]# vim .dockerignore
+
+vim .dockerignore
+
+app.js
+
+:wq
+
+
+[root@DOCKER-TRIVY ~]# vim Dockerfile
+
+vim Dockerfile
+
+FROM nginx
+COPY . /usr/share/nginx/html/
+
+:wq
+
+[root@DOCKER-TRIVY ~]# docker images
+REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
+image5       latest    5ea89df2a37e   8 minutes ago    177MB
+image3       latest    b6cbfee477d8   20 minutes ago   909MB
+image4       latest    b6cbfee477d8   20 minutes ago   909MB
+image1       latest    754eae4dd428   22 minutes ago   66.9MB
+image2       latest    754eae4dd428   22 minutes ago   66.9MB
+[root@DOCKER-TRIVY ~]# docker build -t image6 .
+[+] Building 29.2s (7/7) FINISHED              
+
+
+[root@DOCKER-TRIVY ~]# docker run -itd --name cont1 image6
+f451f7a48ff7e76be823dfac300e79acb70997c35611d768e368614e6d45d7ed
+[root@DOCKER-TRIVY ~]# 
+
+[root@DOCKER-TRIVY ~]# docker exec -it cont1 bash
+root@f451f7a48ff7:/# ll
+bash: ll: command not found
+root@f451f7a48ff7:/# cd usr/share/nginx/html/
+root@f451f7a48ff7:/usr/share/nginx/html# ll
+bash: ll: command not found
+root@f451f7a48ff7:/usr/share/nginx/html# ls
+50x.html  Dockerfile  index.html  styles.css
+root@f451f7a48ff7:/usr/share/nginx/html#
+
+
+app.js got ignored here
+
+[root@DOCKER-TRIVY ~]# docker images
+REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
+image6       latest    561fc9ebdc43   4 minutes ago    1.33GB
+image5       latest    5ea89df2a37e   13 minutes ago   177MB
+image3       latest    b6cbfee477d8   25 minutes ago   909MB
+image4       latest    b6cbfee477d8   25 minutes ago   909MB
+image1       latest    754eae4dd428   27 minutes ago   66.9MB
+image2       latest    754eae4dd428   27 minutes ago   66.9MB
+[root@DOCKER-TRIVY ~]# vim Dockerfile 
+[root@DOCKER-TRIVY ~]# cat Dockerfile 
+FROM nginx:alpine
+COPY . /usr/share/nginx/html/
+[root@DOCKER-TRIVY ~]# 
+
+
+[root@DOCKER-TRIVY ~]# docker images
+REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
+image6       latest    561fc9ebdc43   6 minutes ago    1.33GB
+image5       latest    5ea89df2a37e   16 minutes ago   177MB
+image3       latest    b6cbfee477d8   27 minutes ago   909MB
+image4       latest    b6cbfee477d8   27 minutes ago   909MB
+image1       latest    754eae4dd428   30 minutes ago   66.9MB
+image2       latest    754eae4dd428   30 minutes ago   66.9MB
+[root@DOCKER-TRIVY ~]# docker build -t image7 .
+[+] Building 20.9s (7/7) FINISHED          
+
+
+as of now we done in root directory 
+
+we will do now in another folder and here we will do perform 
+
+[root@DOCKER-TRIVY ~]# mkdir folder1
+
+[root@DOCKER-TRIVY ~]# cp Dockerfile app.js .dockerignore index.html styles.css folder1
+
+
+[root@DOCKER-TRIVY ~]# mkdir folder1
+[root@DOCKER-TRIVY ~]# cp Dockerfile app.js .dockerignore index.html styles.css folder1/
+[root@DOCKER-TRIVY ~]# cd folder1/
+[root@DOCKER-TRIVY folder1]# docker images
+REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
+image7       latest    872b24d969a9   3 minutes ago    1.23GB
+image6       latest    561fc9ebdc43   10 minutes ago   1.33GB
+image5       latest    5ea89df2a37e   20 minutes ago   177MB
+image4       latest    b6cbfee477d8   31 minutes ago   909MB
+image3       latest    b6cbfee477d8   31 minutes ago   909MB
+image1       latest    754eae4dd428   34 minutes ago   66.9MB
+image2       latest    754eae4dd428   34 minutes ago   66.9MB
+[root@DOCKER-TRIVY folder1]# docker build -t image7 .
+[+] Building 0.2s (7/7) FINISHED                                                                                                                          docker:default
+ => [internal] load build definition from Dockerfile                                                                                                                0.0s
+ => => transferring dockerfile: 145B                                                                                                                                0.0s
+ => [internal] load metadata for docker.io/library/nginx:alpine                                                                                                     0.1s
+ => [internal] load .dockerignore                                                                                                                                   0.0s
+ => => transferring context: 107B                                                                                                                                   0.0s
+ => [internal] load build context                                                                                                                                   0.0s
+ => => transferring context: 436B                                                                                                                                   0.0s
+ => CACHED [1/2] FROM docker.io/library/nginx:alpine@sha256:54f2a904c251d5a34adf545a72d32515a15e08418dae0266e23be2e18c66fefa                                        0.0s
+ => [2/2] COPY . /usr/share/nginx/html/                                                                                                                             0.0s
+ => exporting to image                                                                                                                                              0.0s
+ => => exporting layers                                                                                                                                             0.0s
+ => => writing image sha256:bec470975238afec9804bfa7f0f79b07e94cf16f8812f9d06e5eb2240cb0ac21                                                                        0.0s
+ => => naming to docker.io/library/image7                                                                                                                           0.0s
+[root@DOCKER-TRIVY folder1]# docker images
+REPOSITORY   TAG       IMAGE ID       CREATED          SIZE
+image7       latest    bec470975238   10 seconds ago   62.2MB -----------------------------> image ssize has been reduced here by performing action in another folder instead of root
+<none>       <none>    872b24d969a9   3 minutes ago    1.23GB
+image6       latest    561fc9ebdc43   10 minutes ago   1.33GB
+image5       latest    5ea89df2a37e   20 minutes ago   177MB
+image3       latest    b6cbfee477d8   32 minutes ago   909MB
+image4       latest    b6cbfee477d8   32 minutes ago   909MB
+image1       latest    754eae4dd428   34 minutes ago   66.9MB
+image2       latest    754eae4dd428   34 minutes ago   66.9MB
+[root@DOCKER-TRIVY folder1]# 
+
+
+
+end
