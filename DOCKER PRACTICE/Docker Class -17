@@ -474,7 +474,7 @@ pipeline {
         }
         stage ("Push") {
             steps {
-                script { --------------------------------------------------------> how to 
+                script { --------------------------------------------------------> below are the steps how to take this script for this script 
                     withDockerRegistry(credentialsId: 'Dockerhub') {
                         sh 'docker push pranay419/jairepo:appimage'
                         sh 'docker push pranay419/ramrepo:dbimage'
@@ -484,6 +484,15 @@ pipeline {
         }
     }
 }
+
+
+install Docker Pipeline plugin 
+
+go to pipeline syntax in configure job ---------> select witDockerRegistry: Sets up Docker registry endpoint-------------> give DockerHub credentials and add it-----
+-----------------> generate pipeline
+
+
+
 
 upto now save and build the Job 
 
