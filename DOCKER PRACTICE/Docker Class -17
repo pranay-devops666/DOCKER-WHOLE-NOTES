@@ -460,6 +460,12 @@ pipeline {
                 sh 'docker build -t dbimage Docker-db'
             }
         }
+        stage ("ScanImage") {
+            steps {
+                sh 'trivy image appimage'
+                sh 'trivy image dbimage'
+            }
+        }
         stage ("Tag") {
             steps {
                 sh 'docker tag appimage pranay419/jairepo:appimage'
@@ -468,7 +474,7 @@ pipeline {
         }
         stage ("Push") {
             steps {
-                script {
+                script { --------------------------------------------------------> how to 
                     withDockerRegistry(credentialsId: 'Dockerhub') {
                         sh 'docker push pranay419/jairepo:appimage'
                         sh 'docker push pranay419/ramrepo:dbimage'
