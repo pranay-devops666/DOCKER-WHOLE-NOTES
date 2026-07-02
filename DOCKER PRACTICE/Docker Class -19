@@ -609,8 +609,36 @@ http://52.90.107.201:5000/signin
 
 successfully launched an application
 
+Now we need t be create like below
+
+[root@MASTER-SERVER-NODE ~]# docker service ps babu_db
+ID             NAME        IMAGE                        NODE            DESIRED STATE   CURRENT STATE                ERROR     PORTS
+5lde5e6xtddg   babu_db.1   pranay419/babu2026:dbimage   WORKER-NODE-1   Running         Running about a minute ago             
+[root@MASTER-SERVER-NODE ~]#
+
+The database is running in MASTER server only
+
+[root@MASTER-SERVER-NODE ~]# docker service ls
+ID             NAME                  MODE         REPLICAS   IMAGE                            PORTS
+ops2k6zigjem   babu_app_service      replicated   1/1        pranay419/babu2026:appimage      *:5000->5000/tcp
+afyayoy159di   babu_auth_service     replicated   1/1        pranay419/babu2026:authimage     *:5001->5001/tcp
+tibrqeauqy8h   babu_book_service     replicated   1/1        pranay419/babu2026:bookimage     *:5002->5002/tcp
+sg27s05yqrd7   babu_borrow_service   replicated   1/1        pranay419/babu2026:borrowimage   *:5003->5003/tcp
+9kvsmbkl6o8n   babu_db               replicated   1/1        pranay419/babu2026:dbimage       *:3306->3306/tcp
+[root@MASTER-SERVER-NODE ~]#
+
+
+Now try to access the application with worker-node-1 or worker-node-2 public IP:5000
+
+http://52.90.107.201:5000/signin
+
+successfully launched an application
+
 Now we need to distribute the traffic equally to worker-node-1 and  worker-node-2 to access the application request from users in real time  is 
 Need to create LoadBalancer
+
+Now Need to create LoadBalancer
+====================================
 
 Go to aws dashboard and need to create target group here ----------> Go to aws dashboard search as target groups-----------> 
 
@@ -618,11 +646,30 @@ what is target groups means in which servers we need to send the traffic equally
 traffic equally 
 
 Go to aws dashboard and need to create target group here ----------> Go to aws dashboard search as target groups-----------> create target group------> select instances
------------> give port :5000---------> next-----> select 2 worker nodes------> select including as pendig before--------> next----------> create 
+-----------> Target Grup name: MyTarget-Group-------------->give port :5000---------> next-----> select 2 worker nodes------> select including as pendig before--------> next----------> create 
 
 target group has been created 
 
 Now we will create Load Balancers
+=======================================
+
+Now we will do create Load Balancers like below
+
+Go to AWS Dashbard -----------> search as Load Balancers ----------> select Load Balancers --------------> create Load Balancer -----------> here 3 types of Load 
+Balancers we can see but we will take Application Load Balancer only 3 Load Balancers are 1.Application Load Balancer 2. Network Load Balancer 3. Gateway Load 
+Balancers -----------> select Appication Load Balancer ----------> click create ---------> Load balancer name:MyLoadBalaner -----------> select and click which 
+availabilty zones servers are present select that availabilty zones ------------------> select here security group what we given the ec2-instances -------->
+Target Group: select here what we created a Target group above --------------> create Load Balancer
+
+As of now all we created manual way only
+
+but in Kubernetes we not do in manual way
+
+once Created Target Group & Created Load Balancer got active state means go on it
+
+Now open created Load Balancer --------> DNS name will appear ------------> copy DNS name and paste in new tab -----------> Application will be accessible
+
+
 
 
 
