@@ -48,6 +48,10 @@ Install pipeline stage view plugin to view logs and console output clearly
 
 Go to manage jenkins--------------> select plugins -----------> search as pipeline stage view----------------> install it
 
+
+[root@ip-172-31-21-140 ~]# chmod 777 /var/run/docker.sock
+[root@ip-172-31-21-140 ~]# 
+
 Now create a Job
 
 Click on New Item ---------------> create a pipeline Job-----------> Name:Pipeline
