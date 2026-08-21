@@ -112,6 +112,34 @@ Now we need to Integrate in our job pipeline
 
 Now add Maven tool & CAQ stage in Job pipeline like below
 
+as per new update 
+==================
+
+pipeline {
+    agent any
+    tools {
+        maven 'mymaven'
+    }
+    stages {
+        stage ("Code") {
+            steps {
+                git 'https://github.com/pranay-devops666/dockerwebapp.git'
+            }
+        }
+        stage ("CAQ") {
+            steps {
+                withSonarQubeEnv('mysonar') {
+                    sh "mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MyProject"
+                }
+            }
+        }
+    }
+}
+
+save & Build the Job
+
+Build Job got success -----------> Sonarqube CAQ Stage has done 
+
 pipeline {
     agent any
     tools {
@@ -170,7 +198,31 @@ pipeline {
 
 save & Build the Job
 
-Build Job got success 
+Build Job got success
+
+as per new update 
+==================
+
+pipeline {
+    agent any
+    tools {
+        maven 'mymaven'
+    }
+    stages {
+        stage ("Code") {
+            steps {
+                git 'https://github.com/pranay-devops666/dockerwebapp.git'
+            }
+        }
+        stage ("CAQ") {
+            steps {
+                withSonarQubeEnv('mysonar') {
+                    sh "mvn clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=MyProject"
+                }
+            }
+        }
+    }
+}
 
 Now Artifacts (nexusArtifactUploader)
 
