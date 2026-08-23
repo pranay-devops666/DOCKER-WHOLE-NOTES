@@ -551,6 +551,9 @@ docker-compose build
 stage:6
 docker-compose up
 
+https://chatgpt.com/c/6a8b0106-c6b0-83e8-8b3c-013fb8225561 ---------------------> to know jenkins pipeline script to do automate 
+=================================================================
+
 
 DOCKERFILE TO CREATE VOLUMES NETWORKS AND HOW TO CONNECT ONE NETWORK TO ANOTHER NETWORK
 ==========================================================================================
