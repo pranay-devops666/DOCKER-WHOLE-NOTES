@@ -541,18 +541,68 @@ if we want to do in jenkins stages are below
 stage:1
 code
 stage:2
-cqa
-stage:3
-code-build
-stage:4
-atrifact
-stage:5
 docker-compose build
-stage:6
+stage:3
 docker-compose up
 
-https://chatgpt.com/c/6a8b0106-c6b0-83e8-8b3c-013fb8225561 ---------------------> to know jenkins pipeline script to do automate 
-=================================================================
+pipeline {
+    agent any
+    stages {
+        stage('Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/pranay-devops666/Swiggy-apps.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh '''
+                   cd swiggy-app
+                   docker build -t dineout ./dineout
+                    docker build -t food-delivery ./food-delivery
+                    docker build -t genie ./genie
+                    docker build -t instamart ./instamart
+                '''
+            }
+        }
+        stage('docker-compose') {
+            steps {
+                sh '''
+                   cd swiggy-app
+                   docker-compose up -d
+                   docker-compose ps
+                '''
+            }
+        }
+    }
+}
+
+OUTPUT
+=======
+
+[Pipeline] sh
++ cd swiggy-app
++ docker-compose up -d
+Recreating dineout-contt ... 
+Recreating genie-contt   ... 
+Recreating food-deliver-contt ... 
+Recreating instamart-contt    ... 
+Recreating food-deliver-contt ... done
+Recreating instamart-contt    ... done
+Recreating genie-contt        ... done
+Recreating dineout-contt      ... done
++ docker-compose ps
+         Name                       Command               State                  Ports                
+------------------------------------------------------------------------------------------------------
+dineout-container        /docker-entrypoint.sh ngin ...   Up      0.0.0.0:1122->80/tcp,:::1122->80/tcp
+food-deliver-container   /docker-entrypoint.sh ngin ...   Up      0.0.0.0:2233->80/tcp,:::2233->80/tcp
+genie-container          /docker-entrypoint.sh ngin ...   Up      0.0.0.0:3344->80/tcp,:::3344->80/tcp
+instamart-container      /docker-entrypoint.sh ngin ...   Up      0.0.0.0:4455->80/tcp,:::4455->80/tcp
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
 
 
 DOCKERFILE TO CREATE VOLUMES NETWORKS AND HOW TO CONNECT ONE NETWORK TO ANOTHER NETWORK
