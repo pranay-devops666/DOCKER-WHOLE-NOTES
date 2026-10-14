@@ -104,7 +104,7 @@ now the created volume need to be mount a new container while creating a contain
 =======================================================================================
 
 
-docker run -itd --name cont1 --mount src=/pranaydb,destination=/babu ubuntu -------------------> command to create a mount 
+docker run -itd --name cont1 --mount src=pranaydb,destination=/babu ubuntu -------------------> command to create a mount 
 # cont1----> container name praaydb-----> volume name babu------>going to mount in this path inside a container ubuntu base image 
 
 
