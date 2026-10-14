@@ -1,7 +1,7 @@
 Docker Class -06
 
-TOPIC: 3-TIER APP DEPLOYMENT & Dockerhub pushing images
-===========================================================
+TOPIC: 3-TIER APP DEPLOYMENT using Docker Registry & pushing images into a Dockerhub after deployed both appcontainer & db container
+=====================================================================================================================================
 
 3-TIER APP DEPLOYMENT USING JENKINS AND DOCKERFILE REGISTRY
 
